@@ -1,6 +1,7 @@
 /**
- * useEntries hook — stub for plan 03-02
- * Will be fully implemented in the next plan.
+ * useEntries hook — API integration for research entry submission and retrieval.
+ * submitEntry: POST to /api/submitEntry
+ * getEntry: GET from /api/entry/{id}
  */
 
 import { useState } from 'react';
@@ -27,7 +28,7 @@ export default function useEntries() {
         return null;
       }
       setCurrentEntry(data);
-      setSuccessMessage('Entry submitted successfully.');
+      setSuccessMessage('Entry submitted successfully and is pending review.');
       return data;
     } catch (err) {
       setError(err.message || 'Network error');
