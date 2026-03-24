@@ -9,6 +9,12 @@ export function getClient() {
   return client
 }
 
+export function getEntriesContainer() {
+  return entriesContainer
+}
+
+export { entriesContainer }
+
 export async function initCosmosDb() {
   const connectionString = process.env.COSMOS_DB_CONNECTION_STRING
   const dbName = process.env.COSMOS_DB_DATABASE || 'rhw-research'
