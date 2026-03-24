@@ -1,0 +1,15 @@
+{
+  "workflow": {
+    "model_profile": "balanced",
+    "executor_model": "sonnet",
+    "verifier_model": "sonnet",
+    "parallelization": true,
+    "auto_advance": false,
+    "_auto_chain_active": false
+  },
+  "project": {
+    "name": "RHW Research Database",
+    "milestone": "v1.0",
+    "github_repo": "https://github.com/Genuitech/rhw-research-db"
+  }
+}
