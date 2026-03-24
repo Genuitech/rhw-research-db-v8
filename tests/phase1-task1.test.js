@@ -31,7 +31,7 @@ describe('Phase 1, Task 1: Project Structure & Dependencies', () => {
       expect(content).toContain('node_modules/');
       expect(content).toContain('.env.local');
       expect(content).toContain('.DS_Store');
-      expect(content).toContain('dist/');
+      expect(content).toContain('/dist');
       expect(content).toContain('.vscode/');
     });
   });
@@ -48,8 +48,8 @@ describe('Phase 1, Task 1: Project Structure & Dependencies', () => {
       // Dependencies
       expect(pkg.dependencies).toHaveProperty('react');
       expect(pkg.dependencies).toHaveProperty('react-dom');
-      expect(pkg.dependencies.react).toMatch(/^18\./);
-      expect(pkg.dependencies['react-dom']).toMatch(/^18\./);
+      expect(pkg.dependencies.react).toMatch(/\^18\./);  // Match caret version like ^18.2.0
+      expect(pkg.dependencies['react-dom']).toMatch(/\^18\./);
 
       // Dev dependencies
       expect(pkg.devDependencies).toHaveProperty('vite');
@@ -198,13 +198,13 @@ describe('Phase 1, Task 1: Project Structure & Dependencies', () => {
   });
 
   describe('Dependencies Installation', () => {
-    it('should have node_modules directory', async () => {
+    it('should have node_modules directory at root (npm workspaces)', async () => {
       const nodeModules = path.join(rootDir, 'node_modules');
       const stat = await fs.stat(nodeModules);
       expect(stat.isDirectory()).toBe(true);
     });
 
-    it('should have installed root dependencies', async () => {
+    it('should have installed root dependencies including workspace packages', async () => {
       const dirs = ['node_modules'];
       for (const dir of dirs) {
         const fullPath = path.join(rootDir, dir);
@@ -213,15 +213,15 @@ describe('Phase 1, Task 1: Project Structure & Dependencies', () => {
       }
     });
 
-    it('should have installed frontend dependencies', async () => {
-      const nodeModules = path.join(rootDir, 'frontend/node_modules');
-      const stat = await fs.stat(nodeModules);
+    it('should have installed @rhw-research workspace packages', async () => {
+      const rhwResearch = path.join(rootDir, 'node_modules/@rhw-research');
+      const stat = await fs.stat(rhwResearch);
       expect(stat.isDirectory()).toBe(true);
     });
 
-    it('should have installed api dependencies', async () => {
-      const nodeModules = path.join(rootDir, 'api/node_modules');
-      const stat = await fs.stat(nodeModules);
+    it('should have installed React in root node_modules', async () => {
+      const react = path.join(rootDir, 'node_modules/react');
+      const stat = await fs.stat(react);
       expect(stat.isDirectory()).toBe(true);
     });
   });
