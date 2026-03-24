@@ -4,21 +4,24 @@ import { buildSearchQuery, applyFilters } from '../../src/utils/searchUtil.js'
 describe('Search Utilities', () => {
   describe('buildSearchQuery', () => {
     it('should create basic full-text search query', () => {
-      const query = buildSearchQuery('tax strategy', {})
-      expect(query).toContain('SELECT *')
-      expect(query).toContain('CONTAINS')
-      expect(query.toLowerCase()).toContain('where')
+      const { sql, parameters } = buildSearchQuery('tax strategy', {})
+      expect(sql).toContain('SELECT *')
+      expect(sql).toContain('CONTAINS')
+      expect(sql.toLowerCase()).toContain('where')
+      expect(Array.isArray(parameters)).toBe(true)
     })
 
     it('should handle empty query string', () => {
-      const query = buildSearchQuery('', {})
-      expect(query).toBeDefined()
-      expect(typeof query).toBe('string')
+      const result = buildSearchQuery('', {})
+      expect(result).toBeDefined()
+      expect(result.sql).toBeDefined()
+      expect(Array.isArray(result.parameters)).toBe(true)
     })
 
     it('should escape special characters in search terms', () => {
-      const query = buildSearchQuery('S-Corp election', {})
-      expect(query).toBeDefined()
+      const { sql, parameters } = buildSearchQuery('S-Corp election', {})
+      expect(sql).toBeDefined()
+      expect(parameters).toBeDefined()
       // Should not throw
     })
   })
@@ -26,21 +29,23 @@ describe('Search Utilities', () => {
   describe('applyFilters', () => {
     it('should filter by status', () => {
       const filters = { status: 'pending' }
-      const query = buildSearchQuery('', filters)
-      expect(query).toContain('status')
-      expect(query).toContain('pending')
+      const { sql, parameters } = buildSearchQuery('', filters)
+      expect(sql).toContain('status')
+      expect(parameters.some(p => p.name === '@status')).toBe(true)
     })
 
     it('should filter by type (memo, sop, policy)', () => {
       const filters = { type: 'memo' }
-      const query = buildSearchQuery('', filters)
-      expect(query).toContain('type')
+      const { sql, parameters } = buildSearchQuery('', filters)
+      expect(sql).toContain('type')
+      expect(parameters.some(p => p.name === '@type')).toBe(true)
     })
 
     it('should filter by author email', () => {
       const filters = { author: 'user@rhwcpas.com' }
-      const query = buildSearchQuery('', filters)
-      expect(query).toContain('author')
+      const { sql, parameters } = buildSearchQuery('', filters)
+      expect(sql).toContain('author')
+      expect(parameters.some(p => p.name === '@author')).toBe(true)
     })
 
     it('should filter by date range (createdAfter, createdBefore)', () => {
@@ -48,38 +53,39 @@ describe('Search Utilities', () => {
         createdAfter: '2026-03-01T00:00:00Z',
         createdBefore: '2026-03-24T23:59:59Z'
       }
-      const query = buildSearchQuery('', filters)
-      expect(query).toContain('createdAt')
+      const { sql, parameters } = buildSearchQuery('', filters)
+      expect(sql).toContain('createdAt')
     })
 
     it('should combine multiple filters', () => {
       const filters = { status: 'approved', type: 'memo', author: 'user@rhwcpas.com' }
-      const query = buildSearchQuery('tax', filters)
-      expect(query).toContain('status')
-      expect(query).toContain('type')
-      expect(query).toContain('author')
+      const { sql, parameters } = buildSearchQuery('tax', filters)
+      expect(sql).toContain('status')
+      expect(sql).toContain('type')
+      expect(sql).toContain('author')
     })
 
     it('should handle tag filter (array)', () => {
       const filters = { tags: ['tax-strategy', 'S-Corp'] }
-      const query = buildSearchQuery('', filters)
-      expect(query).toContain('tags')
+      const { sql, parameters } = buildSearchQuery('', filters)
+      expect(sql).toContain('ARRAY_CONTAINS')
     })
   })
 
   describe('pagination', () => {
     it('should apply limit and offset to query', () => {
       const filters = { limit: 10, offset: 20 }
-      const query = buildSearchQuery('', filters)
-      expect(query).toContain('OFFSET')
-      expect(query).toContain('LIMIT')
+      const { sql } = buildSearchQuery('', filters)
+      expect(sql).toContain('OFFSET')
+      expect(sql).toContain('LIMIT')
     })
 
     it('should have sensible defaults (limit=20, offset=0)', () => {
       const filters = {}
-      const query = buildSearchQuery('test', filters)
-      // Should not throw, and should handle pagination automatically
-      expect(query).toBeDefined()
+      const result = buildSearchQuery('test', filters)
+      expect(result).toBeDefined()
+      expect(result.limit).toBe(20)
+      expect(result.offset).toBe(0)
     })
   })
 })
