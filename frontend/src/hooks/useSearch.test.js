@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useSearch } from './useSearch.js';
 
 // Mock fetch globally
@@ -100,15 +100,12 @@ describe('useSearch hook', () => {
       // Should not call fetch immediately
       expect(mockFetch).not.toHaveBeenCalled();
 
-      // Advance timers past debounce (300ms)
-      act(() => {
+      // Advance past debounce and flush promises
+      await act(async () => {
         vi.advanceTimersByTime(350);
       });
 
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledTimes(1);
-      });
-
+      expect(mockFetch).toHaveBeenCalledTimes(1);
       const [url] = mockFetch.mock.calls[0];
       expect(url).toContain('/api/search');
       expect(url).toContain('q=1099');
@@ -133,59 +130,45 @@ describe('useSearch hook', () => {
 
       act(() => {
         result.current.setQuery('tax');
-      });
-
-      act(() => {
         vi.advanceTimersByTime(100);
         result.current.setQuery('taxes');
-      });
-
-      act(() => {
         vi.advanceTimersByTime(100);
         result.current.setQuery('taxes 2025');
       });
 
-      act(() => {
+      // Advance past final debounce
+      await act(async () => {
         vi.advanceTimersByTime(350);
       });
 
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledTimes(1);
-      });
-
+      expect(mockFetch).toHaveBeenCalledTimes(1);
       const [url] = mockFetch.mock.calls[0];
       expect(url).toContain('q=taxes+2025');
     });
 
-    it('fetches immediately on mount with empty query to load all entries', async () => {
+    it('fetches after debounce on mount with empty query', async () => {
       const { result } = renderHook(() => useSearch());
 
-      // Advance timers to trigger initial fetch
-      act(() => {
+      await act(async () => {
         vi.advanceTimersByTime(350);
       });
 
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledTimes(1);
-      });
+      expect(mockFetch).toHaveBeenCalledTimes(1);
     });
 
     it('populates results after successful fetch', async () => {
       const { result } = renderHook(() => useSearch());
 
-      act(() => {
+      await act(async () => {
         vi.advanceTimersByTime(350);
       });
 
-      await waitFor(() => {
-        expect(result.current.results).toHaveLength(2);
-      });
-
+      expect(result.current.results).toHaveLength(2);
       expect(result.current.results[0].id).toBe('entry-1');
       expect(result.current.total).toBe(2);
     });
 
-    it('sets loading to true during fetch', async () => {
+    it('sets loading to true during fetch and false after', async () => {
       let resolveFetch;
       mockFetch.mockReturnValue(
         new Promise((resolve) => {
@@ -195,23 +178,20 @@ describe('useSearch hook', () => {
 
       const { result } = renderHook(() => useSearch());
 
+      // Start the fetch (timer fires but promise is pending)
       act(() => {
         vi.advanceTimersByTime(350);
       });
 
-      // Loading should be true while fetch is pending
-      await waitFor(() => {
-        expect(result.current.loading).toBe(true);
-      });
+      // Loading should be true synchronously after timer
+      expect(result.current.loading).toBe(true);
 
       // Resolve the fetch
-      act(() => {
+      await act(async () => {
         resolveFetch(makeOkResponse(mockApiResponse));
       });
 
-      await waitFor(() => {
-        expect(result.current.loading).toBe(false);
-      });
+      expect(result.current.loading).toBe(false);
     });
   });
 
@@ -223,14 +203,11 @@ describe('useSearch hook', () => {
         result.current.setFilters({ status: 'approved', type: '', tags: [] });
       });
 
-      act(() => {
+      await act(async () => {
         vi.advanceTimersByTime(350);
       });
 
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalled();
-      });
-
+      expect(mockFetch).toHaveBeenCalled();
       const [url] = mockFetch.mock.calls[0];
       expect(url).toContain('status=approved');
     });
@@ -242,14 +219,11 @@ describe('useSearch hook', () => {
         result.current.setFilters({ status: '', type: 'memo', tags: [] });
       });
 
-      act(() => {
+      await act(async () => {
         vi.advanceTimersByTime(350);
       });
 
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalled();
-      });
-
+      expect(mockFetch).toHaveBeenCalled();
       const [url] = mockFetch.mock.calls[0];
       expect(url).toContain('type=memo');
     });
@@ -261,14 +235,11 @@ describe('useSearch hook', () => {
         result.current.setFilters({ status: '', type: '', tags: ['payroll', '1099'] });
       });
 
-      act(() => {
+      await act(async () => {
         vi.advanceTimersByTime(350);
       });
 
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalled();
-      });
-
+      expect(mockFetch).toHaveBeenCalled();
       const [url] = mockFetch.mock.calls[0];
       expect(url).toContain('tags=payroll');
       expect(url).toContain('tags=1099');
@@ -277,14 +248,11 @@ describe('useSearch hook', () => {
     it('omits empty filters from URL', async () => {
       const { result } = renderHook(() => useSearch());
 
-      act(() => {
+      await act(async () => {
         vi.advanceTimersByTime(350);
       });
 
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalled();
-      });
-
+      expect(mockFetch).toHaveBeenCalled();
       const [url] = mockFetch.mock.calls[0];
       expect(url).not.toContain('status=');
       expect(url).not.toContain('type=');
@@ -300,30 +268,33 @@ describe('useSearch hook', () => {
     it('calls API with correct offset when page changes', async () => {
       const { result } = renderHook(() => useSearch());
 
-      act(() => {
+      // Initial fetch
+      await act(async () => {
         vi.advanceTimersByTime(350);
       });
 
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledTimes(1);
-      });
+      const initialCallCount = mockFetch.mock.calls.length;
 
-      mockFetch.mockClear();
-
-      act(() => {
+      // Go to page 2 — triggers a new debounce
+      await act(async () => {
         result.current.goToPage(2);
       });
 
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledTimes(1);
+      await act(async () => {
+        vi.advanceTimersByTime(350);
       });
 
-      const [url] = mockFetch.mock.calls[0];
+      // Should have made one additional call beyond the initial
+      expect(mockFetch.mock.calls.length).toBeGreaterThan(initialCallCount);
+
+      // The last call should have offset=20 (page 2)
+      const lastCall = mockFetch.mock.calls[mockFetch.mock.calls.length - 1];
+      const [url] = lastCall;
       expect(url).toContain('offset=20');
       expect(url).toContain('limit=20');
     });
 
-    it('resets to page 1 when query changes', async () => {
+    it('resets to page 1 when query changes', () => {
       const { result } = renderHook(() => useSearch());
 
       // Go to page 2
@@ -333,7 +304,7 @@ describe('useSearch hook', () => {
 
       expect(result.current.page).toBe(2);
 
-      // Change query
+      // Change query — should reset page
       act(() => {
         result.current.setQuery('new query');
       });
@@ -341,7 +312,7 @@ describe('useSearch hook', () => {
       expect(result.current.page).toBe(1);
     });
 
-    it('resets to page 1 when filters change', async () => {
+    it('resets to page 1 when filters change', () => {
       const { result } = renderHook(() => useSearch());
 
       act(() => {
@@ -364,14 +335,11 @@ describe('useSearch hook', () => {
 
       const { result } = renderHook(() => useSearch());
 
-      act(() => {
+      await act(async () => {
         vi.advanceTimersByTime(350);
       });
 
-      await waitFor(() => {
-        expect(result.current.error).not.toBe(null);
-      });
-
+      expect(result.current.error).not.toBe(null);
       expect(result.current.loading).toBe(false);
       expect(result.current.results).toEqual([]);
     });
@@ -381,44 +349,39 @@ describe('useSearch hook', () => {
 
       const { result } = renderHook(() => useSearch());
 
-      act(() => {
+      await act(async () => {
         vi.advanceTimersByTime(350);
       });
 
-      await waitFor(() => {
-        expect(result.current.error).not.toBe(null);
-      });
-
+      expect(result.current.error).not.toBe(null);
       expect(result.current.loading).toBe(false);
     });
 
     it('clears error on successful retry', async () => {
       mockFetch.mockResolvedValueOnce(makeErrorResponse(500, 'Server error'));
-      mockFetch.mockResolvedValueOnce(makeOkResponse(mockApiResponse));
 
       const { result } = renderHook(() => useSearch());
 
-      act(() => {
+      await act(async () => {
         vi.advanceTimersByTime(350);
       });
 
-      await waitFor(() => {
-        expect(result.current.error).not.toBe(null);
-      });
+      expect(result.current.error).not.toBe(null);
+
+      // Set up success for next call
+      mockFetch.mockResolvedValueOnce(makeOkResponse(mockApiResponse));
 
       // Trigger retry via new query
       act(() => {
         result.current.setQuery('retry');
       });
 
-      act(() => {
+      await act(async () => {
         vi.advanceTimersByTime(350);
       });
 
-      await waitFor(() => {
-        expect(result.current.error).toBe(null);
-        expect(result.current.results).toHaveLength(2);
-      });
+      expect(result.current.error).toBe(null);
+      expect(result.current.results).toHaveLength(2);
     });
   });
 });

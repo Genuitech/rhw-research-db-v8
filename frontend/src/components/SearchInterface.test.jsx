@@ -204,9 +204,10 @@ describe('SearchInterface component', () => {
 
       render(<SearchInterface />);
 
+      // Use getAllByText because 'policy' appears in both the TypeBadge and a tag span
       expect(screen.getByText('memo')).toBeInTheDocument();
       expect(screen.getByText('sop')).toBeInTheDocument();
-      expect(screen.getByText('policy')).toBeInTheDocument();
+      expect(screen.getAllByText('policy').length).toBeGreaterThanOrEqual(1);
     });
 
     it('displays entry status on each card', () => {
