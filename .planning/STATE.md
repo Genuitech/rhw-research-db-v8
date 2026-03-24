@@ -1,6 +1,6 @@
 # Project State
 
-**Last Updated:** 2026-03-24T23:54:00Z
+**Last Updated:** 2026-03-24T23:55:00Z
 
 ## Current Position
 
@@ -25,14 +25,17 @@
 ## Decisions
 
 - CSS Modules for scoped component styles (SearchInterface, SubmissionForm)
+- AbortController in useSearch to cancel stale in-flight requests on rapid query changes
 - Tags parsed from comma-separated string on submit, stored as array in API payload
 - useEntries hook clears loading/error/success on each new request call
 - Form clears via useEffect watching successMessage
+- Test pattern: await act(async () => { vi.advanceTimersByTime(350) }) for fake-timer + promise flush
 
 ## Performance Metrics
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
+| 3 | 03-01 | 7 min | 4 | 8 |
 | 3 | 03-02 | 6 min | 4 | 5 |
 
 ## Notes
@@ -42,10 +45,10 @@
 - Backend APIs fully tested and ready
 - Frontend integration can begin immediately
 - Environment variables pending Chea's setup (Cosmos DB, Entra secrets)
-- Phase 3 plan 03-01 (SearchInterface) was pre-built — stub components and tests existed from prior session
+- Phase 3 plan 03-01 (SearchInterface): 47 tests added, 80 total passing, 2 commits
 - Phase 3 plan 03-02 (SubmissionForm): 34 tests passing, 2 commits
 
 ## Last Session
 
-- **Stopped at:** Completed Phase 3 Plan 03-02 (SubmissionForm Component)
-- **Timestamp:** 2026-03-24T23:54:00Z
+- **Stopped at:** Completed Phase 3 Plan 03-01 (SearchInterface Component)
+- **Timestamp:** 2026-03-24T23:55:00Z
