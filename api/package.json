@@ -1,0 +1,23 @@
+{
+  "name": "@rhw-research/api",
+  "version": "0.1.0",
+  "description": "RHW Research & Knowledge Base - Azure Functions API",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "func start",
+    "build": "tsc",
+    "test": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@azure/functions": "^2.0.0",
+    "@azure/cosmos": "^4.0.0",
+    "nodemailer": "^6.9.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4"
+  }
+}
