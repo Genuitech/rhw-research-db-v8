@@ -10,6 +10,8 @@
     "AZURE_CLIENT_ID": "your-client-id",
     "AZURE_CLIENT_SECRET": "your-client-secret",
     "SENDGRID_API_KEY": "your-sendgrid-api-key",
+    "INGEST_API_KEY": "rhw_ingest_key_replace_with_actual_key",
+    "ADMIN_EMAIL": "cromine@rhwcpas.com",
     "NODE_ENV": "development"
   },
   "Host": {
