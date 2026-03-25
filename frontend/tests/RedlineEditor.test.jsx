@@ -70,7 +70,8 @@ describe('RedlineEditor component', () => {
       render(
         <RedlineEditor entry={mockEntry} onCancel={mockOnCancel} onSubmitted={mockOnSubmitted} />
       );
-      expect(screen.getByText(/Form 8829/i)).toBeInTheDocument();
+      // "Form 8829" appears in both the diff preview div and the textarea value
+      expect(screen.getAllByText(/Form 8829/i).length).toBeGreaterThanOrEqual(1);
     });
 
     it('shows an edit textarea pre-populated with the memo content', () => {
@@ -101,7 +102,8 @@ describe('RedlineEditor component', () => {
       render(
         <RedlineEditor entry={mockEntry} onCancel={mockOnCancel} onSubmitted={mockOnSubmitted} />
       );
-      expect(screen.getByText(/preview|changes|diff/i)).toBeInTheDocument();
+      // The panel label "Preview Changes" matches preview|changes|diff — use getAllByText
+      expect(screen.getAllByText(/preview|changes|diff/i).length).toBeGreaterThanOrEqual(1);
     });
 
     it('updates diff preview when user types in textarea', async () => {
@@ -114,8 +116,8 @@ describe('RedlineEditor component', () => {
       await user.clear(textarea);
       await user.type(textarea, 'Completely new memo content for testing diff.');
 
-      // The diff area should reflect changes
-      expect(screen.getByText(/preview|changes|diff/i)).toBeInTheDocument();
+      // The diff area should still be present after typing
+      expect(screen.getAllByText(/preview|changes|diff/i).length).toBeGreaterThanOrEqual(1);
     });
   });
 

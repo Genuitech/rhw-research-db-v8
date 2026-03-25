@@ -107,12 +107,14 @@ describe('EntryViewer component', () => {
 
     it('displays the entry type', () => {
       render(<EntryViewer entryId="entry-abc" onBack={mockOnBack} />);
-      expect(screen.getByText(/memo/i)).toBeInTheDocument();
+      // "memo" appears in both the TypeBadge and the "Memo / Answer" section label
+      expect(screen.getAllByText(/memo/i).length).toBeGreaterThanOrEqual(1);
     });
 
     it('displays the entry status', () => {
       render(<EntryViewer entryId="entry-abc" onBack={mockOnBack} />);
-      expect(screen.getByText(/approved/i)).toBeInTheDocument();
+      // "approved" appears in both the StatusBadge and the approval history
+      expect(screen.getAllByText(/approved/i).length).toBeGreaterThanOrEqual(1);
     });
 
     it('displays the question / topic', () => {
@@ -122,7 +124,8 @@ describe('EntryViewer component', () => {
 
     it('displays the memo content', () => {
       render(<EntryViewer entryId="entry-abc" onBack={mockOnBack} />);
-      expect(screen.getByText(/Form 8829/i)).toBeInTheDocument();
+      // "Form 8829" appears in both memo text and the tags list
+      expect(screen.getAllByText(/Form 8829/i).length).toBeGreaterThanOrEqual(1);
     });
 
     it('displays all tags', () => {
@@ -134,7 +137,8 @@ describe('EntryViewer component', () => {
 
     it('displays the author', () => {
       render(<EntryViewer entryId="entry-abc" onBack={mockOnBack} />);
-      expect(screen.getByText(/cromine@rhwcpas.com/i)).toBeInTheDocument();
+      // author appears in metaRow and approval history
+      expect(screen.getAllByText(/cromine@rhwcpas.com/i).length).toBeGreaterThanOrEqual(1);
     });
   });
 
@@ -151,7 +155,8 @@ describe('EntryViewer component', () => {
     it('shows each action in the history', () => {
       render(<EntryViewer entryId="entry-abc" onBack={mockOnBack} />);
       expect(screen.getByText(/submitted/i)).toBeInTheDocument();
-      expect(screen.getByText(/approved/i)).toBeInTheDocument();
+      // "approved" appears in both StatusBadge and history — check there is at least one
+      expect(screen.getAllByText(/approved/i).length).toBeGreaterThanOrEqual(1);
     });
 
     it('shows who performed each action', () => {
@@ -189,17 +194,19 @@ describe('EntryViewer component', () => {
 
   describe('edit button', () => {
     it('shows edit button when entry is approved', () => {
+      const mockOnEdit = vi.fn();
       useEntries.mockReturnValue({ ...defaultHookState, currentEntry: mockEntry });
-      render(<EntryViewer entryId="entry-abc" onBack={mockOnBack} />);
+      render(<EntryViewer entryId="entry-abc" onBack={mockOnBack} onEdit={mockOnEdit} />);
       expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
     });
 
     it('shows edit button when entry is pending', () => {
+      const mockOnEdit = vi.fn();
       useEntries.mockReturnValue({
         ...defaultHookState,
         currentEntry: { ...mockEntry, status: 'pending' },
       });
-      render(<EntryViewer entryId="entry-abc" onBack={mockOnBack} />);
+      render(<EntryViewer entryId="entry-abc" onBack={mockOnBack} onEdit={mockOnEdit} />);
       expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
     });
 

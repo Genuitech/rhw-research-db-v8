@@ -343,3 +343,24 @@ select:focus {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* ===== Redline diff highlight classes (used in RedlineEditor diff preview) ===== */
+.redline-add {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  text-decoration: none;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+.redline-del {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  text-decoration: line-through;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+.redline-equal {
+  color: var(--foreground, #e4e4e7);
+}
