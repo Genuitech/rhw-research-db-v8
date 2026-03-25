@@ -1,0 +1,445 @@
+We're putting in progress.
+Uh-oh.
+Let's begin.
+Okay.
+Things on my end, and then we will get started.
+Okay.
+And everybody hear me?
+Are we good?
+Some stuff?
+Okay.
+All right.
+So I have a couple of things that I want to go over with everybody.
+Um, to make sure that we're on the same page.
+Um, and then, uh, then we'll go through our normal, normal routine of updating from each staff member.
+So, um, we are still struggling with the steps of updating, um, the information tab in, um,
+NG of our projects, and then updating the customs tab in practice.
+We really, really need to slow down and make sure we are hitting these spaces.
+I know it's a lot.
+I know it's asking, um, a lot of work.
+Uh, but this is not new requests.
+We were actually supposed to have been doing this last year, and we all slapped on it.
+Myself completely included in that.
+Um, but I am being a real stiffer about it this year.
+So try not to take it completely personal if I'm reaching out to you with reminders about this.
+Um, we just have to get in the habit of doing this and doing it correctly.
+Because remember, GFR is going to be our, our Bible, right?
+Our main page of where we go for information, where we're pulling information for extensions,
+which I have to start working on, um, because that is quickly approaching, especially with the given deadline of two 27 to 28 for businesses.
+Um, so it's vital that we are updating those pieces, um, so that we are able to pull consistent reports.
+So that we're able to tell who still needs to come in, who's missing what, um, who needs to go on extension, et cetera.
+So I'm going to be a real stickler about this, and you're going to get messages from me.
+If I happen to stumble across, um, your, your mistakes.
+So again, it's not to, you know, make you feel bad or anything like that.
+It's just to make sure that we are hitting all the pieces has a team together.
+So I'm going to, um, share my screen so that we can make sure that we can see it as one, give me one second.
+Okay.
+So everybody can see the, the project, right?
+Okay.
+It's the nodding head.
+So the information tab.
+So let's start at the top.
+This is how I make sure that I go through everything.
+Everybody's brain and muscle memory works a little bit different.
+But this at least gives you an idea and then you can alter it to make sure that you are hitting all the pieces.
+I work from top down.
+So I make sure that this workflow, everything should be sure for a tax return.
+The description again needs to be the entity type plus tax return capital T uppercase R.
+I'm not going to make you go back and fix that particular description if you have already missed it.
+Because you do have to route it to yourself.
+So if it's already moved forward right now, I'm not going to ask you to go back and fix that description.
+But I will make sure you're aware that you miss it if I catch it.
+From there, so if the description is wrong, I really just go ahead and route it to myself.
+So you, you know, you click your route.
+Your route box comes up.
+I just keep it back on a waiting start and I'll assign it to myself.
+Okay.
+Remember this checkbox?
+This checkbox means that the current step before you've routed, the current step is sitting on.
+If that box is checked, means it's completed.
+So you can uncheck this box.
+So the prior step wasn't completed.
+Just uncheck the box before you rout it and it will stay as an uncompleted step.
+If you don't check it, it's not the end of the world.
+But if we're looking back at stuff, it does kind of clock things up.
+But it's not the end of the world if you don't.
+So once I've routed to myself, I'll change the description.
+Then I start on the deliverables tab and I work my way right.
+I make sure that there is a deliverable here associated with the engagement type.
+Okay. You click Options.
+We click Add.
+I type in the first four numbers of the entity and I hit Search.
+Typically, it's going to be the one at the top.
+You just have to make sure you look at the due date to make sure you do select the correct one.
+Okay.
+Once I've...
+And this will populate on its own.
+You don't need to do anything else.
+You'll click OK.
+And now you have your deliverable.
+I don't need to add it to the 30 there.
+I think that my delivery instructions.
+Make sure this is filled out.
+If it is blank, I'm going to go probably to the information tab to see what's already there.
+If nothing is there, you're going to have to go look the prior year to see how we sent our tax returns.
+If this is blank, I will complete it on one of the things that we're doing at safe spend.
+We're picking up in person.
+We're mailing it.
+At this point, there should be no document delivery.
+Okay. There should be no other client portal delivery either.
+It should be safe and take up our US mail.
+Okay.
+We have some that are hand delivered.
+That's a special circumstance.
+And then we have some that are overnighted.
+And that is special circumstance as well.
+But typically, it's going to be these first three.
+Then I come to the note.
+I make sure that we do have something here.
+If we don't, it's not a problem because we're going to update it in the information tab.
+It's one time that's already sitting in there.
+If there's nothing here yet, that's okay.
+I'll come back to it in a minute.
+Then I'm going for the information tab.
+I'm making sure that the reviewer is filled in.
+The admin assistant is filled in.
+The staff preparer is filled in.
+Office location is filled in.
+If we know the client's segmentation, which we can find in practice,
+then I'm filling this in.
+The return delivery.
+If it's already selected, great.
+If it needs to be filled in, it's going to be filled in.
+Tax organizer.
+If they're safe then, it's going to be safe then.
+Even if they didn't get one this year, the reason be,
+when I pull a report next year, I'm pulling from here
+so that we can do organizers better next year.
+So this has to be filled in.
+Even if they didn't get via safe then this year,
+if they have safe then,
+they're going to get it next year,
+unless they specifically ask for a different delivery method.
+If they do, then make sure you put in there
+that it is supposed to be paper,
+because that will obviously make a difference
+when we do their organizers next year.
+Because we do have clients that don't let safe send,
+but they want their paper delivery of their organizers still.
+L2 and L1 will most likely be left blank
+unless we are actually doing bookkeeping for those clients.
+Right?
+Now, I'm not asking you guys to go fill in that information,
+but if you see it in practice, please fill it out.
+If it's not there, I'm not asking you to go hunt for it,
+but if it is in practice, please fill it out.
+Bookkeeping service engagement.
+Same thing.
+If we know that there is no bookkeeping,
+select not.
+If we see it in practice that there is a monthly or annual
+or quarterly service, then please note that in this box.
+But typically, our 1040s are going to be 9.
+But just again, check practice.
+Mark here if they have safe send or not.
+Yes or no.
+What tax software are they at?
+Are they an off-tack or a list search?
+Some of those clients who were PSP Jeff,
+who were some of kin rows in,
+who were some of fill wind blows,
+may still be marked as list search software.
+If they are being done by somebody else,
+besides kin, Jeff, or Jocelyn,
+they are going to be done at all tax and that needs to be updated.
+Primary phone number.
+If we have the taxpayers primary phone number,
+you can find it in practice.
+If it's not in practice, you can find it in safe send.
+If it's not in safe send, then it hopefully will be in the notes tab.
+We need to fill that in.
+Same thing with secondary number.
+If we have that information, then we need to fill it in.
+Same thing applies for primary email and secondary email.
+That should be all filled in.
+The received date is when we receive the documents
+to start beginning the work of their tax return.
+Not if we've only gotten a couple documents,
+are we putting this because then we could be waiting weeks
+and then that date is not necessarily correct.
+So when we are ready to put them in queue,
+is when we are going to start putting that date down.
+Internal due date.
+Unless it's specifically asked that it's rushed,
+the internal due date is going to just default to the due date
+for the tax deadline.
+This is a 1040.
+It's going to default.
+We are going to select default of April 15th of 2026.
+Difficulty level.
+I don't expect you guys to go find this.
+Engagement letter received.
+A thousand percent.
+Yes.
+Auto protection.
+Yes.
+If we don't have the engagement letter,
+then you need to select no.
+If they opted out of the tax audit protection,
+we don't have a client's form for them for that,
+then you're going to select no.
+Those two should not be left blank.
+I have a question about that.
+Yes.
+So there are some clients who will send in their engagement letter
+and it's like they got their name,
+they got the call,
+but then they were signed at the very last stage.
+Did that consider the time?
+No.
+So Dileana is asking if we get engagement letters back
+and they've only written their name at the top.
+They didn't sign the signature page.
+Obviously, that's not a signed engagement letter.
+So what needs to happen is we need to make sure that the end
+of the process that we get that signature at the end.
+If it's paper, right?
+If it's digital, we should be able to ask for it
+a little bit easier that way.
+That workflow status,
+if you know that the client has already said,
+they're waiting for additional documents,
+but they're partially ready for preparation,
+you can use the workflow status to let the prepared know,
+hey, it's assigned to you for preparation,
+but you're waiting on an internal K1 way down
+an external K1,
+and be client notes, et cetera.
+This is not necessarily required,
+but if you know it, then fill it out, please.
+Same thing for extension information.
+If you have a client that comes in,
+it says, I want an extension.
+You haven't filled out the extension form, sign it,
+and then you put that information here.
+Because I'm filling the report to make sure,
+weekly right now,
+to make sure that we don't need to be filing an extension immediately.
+It's easier if I kind of stay ahead of it,
+and I or not messaging back to back and forth
+on deadline day at midnight,
+her time at 3 a.m.
+Once that is all filled out,
+I am then going to go into practice,
+find the client,
+I'm making sure that the manager is correct,
+and then I'm coming over the custom fields,
+and when your client picked your documentsgs for a
+library market Summary,
+you're going to send back the evidence,
+not knowing the pages,
+like a script sell or something.
+First, we have the details that I want to send out.
+And it's like someone was sort of pretending
+So please select yes if they are uploading documents to say send to give to us if they can do a paper organizer and that's what they want then select no for that one and then our safe and delivery.
+The only three the only spots that should be blank if we don't know are the L2 L1 bookkeepers and then these last three pieces because that's for the billing department.
+Okay, so we got to make sure that we are hitting these every single time we lock somebody in for a tax return.
+Any questions about that?
+Okay, so with with no questions, I'm going to rely that you guys a thousand percent understand what the expectations are.
+I understand we're going to make mistakes. Sometimes we move too fast. I'm guilty of it as well.
+But we got to make sure that we are following all these steps or hitting all these steps with these.
+Okay, so the next thing that I want to touch base about so everybody is on the same page because I know clients are confused and all about language for safe steps.
+There are two different ways we have to think about space and we have to kind of wrap our brains around some different lingo.
+So a client quote-unquote uploads right they say well I uploaded this we had the situation yesterday.
+I upload a stuff into into safe set.
+Okay, so you know you reach out to Nesa you reach out to Dilyana you reach out to Kalinda and you say you know hey this client says that they uploaded and you know it's not showing in their gather.
+So the next spot that they uploaded would be secure file transfer.
+They're going to think they've uploaded but the lingo we have to remember is that if they sent it to us.
+On there and it looks like they just kind of uploaded it to their safe then portal because it does load into their file and safe set.
+But they're sending it to us and it comes into the RHWPR H inbox in safe set.
+Okay, so you can see there are 39 sitting in here because nobody has touched this inbox.
+And I don't expect the non three safe and gather people are sorry anyone who's not in the safe and gather group.
+I don't expect you to come in here and start pulling documents that's not why I'm showing you this.
+I'm making sure that we understand the lingo it's not in gather where they can where it's the traditional upload right they drag and drop and then it shows on their screen.
+You know the documents that they've uploaded and it ties it into their DRL list.
+This is the other place that they quote unquote upload but for us they're sending it to us.
+So this is where we have to also remember to go look and in safe then you guys all have access.
+You can come to view inboxes and you can view this inbox.
+You could pull the documents down again. I'm not asking you to do that.
+I'm just telling you where else you can look.
+But the problem is is unless you are logged in as the PRH RHW account which I sent that information to be able to log in in our group chat.
+You will not be able to respond back to the client and we have to respond back to acknowledge the upload that we've received their documentation.
+It's very very important that we do that so that they are aware right so they're not just in down this limbo area.
+So if you go in here and you just you pull it down for whatever reason you need to make sure that you respond back.
+And I can see where people have responded back because there's a little scent right next to this.
+Same thing goes for our community inboxes. If you unbolt it you have handled it.
+In safe then transfer we cannot re-bolt it.
+There's no way to re-bolt it unread right now for some reason.
+At least I haven't been able to fight it yet.
+So unless you want to handle that responsibility don't touch it.
+You can ask Kalinda, you can ask Filiana, you can ask Nasa to go in there and pull this down for you or to check for that.
+Those are the people that you need to be reaching out to first.
+Regarding OHA and Stephanie they're going to be getting swamped with processing of tax returns back out the door.
+So we need to stop reaching out to them as much for anything gather related.
+Creating portals, creating organizers in safe send.
+We need to start reducing that, that touching out to those two ladies.
+And you need to be reaching out to me first.
+And then I can divvy out because Kalinda, Deliana and Nasa are still learning on how to create the portals and then do the gather piece to create their organizers in there.
+So until they're solid on that, that has to come through me so I can make sure that they are doing those items correctly.
+Any questions about that?
+The reason why I'm harping on this is because it's causing me a lot more work.
+A lot of work.
+I know we're still kind of young into this and things, there's a lot of new steps that we have to do.
+But I need all three on the same page because I really don't want to continue to kill myself and continue to clean up things that you guys should have a graph on at this point.
+I'm always happy to help out and ask questions as you guys know, thousand percent.
+But I really, really, really thousand percent need your kinds of help with this because I cannot do it all.
+And I'm drowning on my end at this point.
+So if you have questions, if you need additional training, please step up and ask because I don't want to come into the rest of February and rolling into March and April and get the responses of I didn't know I was never told.
+I get that if you don't know, you don't know what you weren't told, but at this point, I feel like I have gone over everything that everyone is responsible for.
+If you are not solid, if you are not certain about this, I have to have you reach out to me ASAP so that we can go over everything.
+So I can make sure you are confident, comfortable and able to move forward in your position.
+So that's all that I have. Again, I'm just trying to be transparent on with you guys so that we can work as a team together.
+So please don't take it personal. I just need to make sure that we're on the same page.
+On my screen, I have Lorraine. So I'm going to start with Lorraine and then we're going to go to miss Erica.
+Good morning, everybody. No, you've answered every question that I was going to ask on your touch up meeting right now. So I'm good.
+Thank you. Thank you.
+We'll go Erica and then Stephanie.
+Good morning. I don't have anything you touched on the say saying who I should reach out to.
+I'm feeling more comfortable, but no questions.
+All right. Perfect. Thank you. Stephanie and then Oha.
+I don't have anything.
+Okay. Oha and then Miss Annabelle.
+Hi, everybody. I have just one question.
+So if we send the answer, people uploaded documents and we started like the prepare started to.
+Because I have.
+One second. Sorry.
+Sorry. So the prepare reached out to me. Hey, Oha, check the notes. We need more documents.
+So what do I need to do? I need to reach out to the person or like who is the responsible person for that?
+Because I will not be able to check each notes from each prepare and reach out to each client.
+So my first question. Who asked you to reach out to the client?
+I had the teams from Adam. He said like I left notes. Can you please check? We need more documents.
+So I'm just not sure like what to do with that.
+Who is the reviewer or the PIC?
+I guess it's Amy, but I can double check.
+Yeah, because Adam is not necessarily supposed to be client facing. That's why he's reaching out.
+So depending on who the PIC is, the admin should reach out.
+That's supporting Adam and should reach out to that client on their behalf.
+I would make sure that shoot. I just lost my strength but reach out on their behalf.
+Yeah, and make sure that the prepare is put in there like what documents they are missing.
+And then you can reach out to the prepare or reach out to the client.
+I would make sure that you see your prepare are on there.
+Doesn't necessarily have to be Adam. You can be see see him, but definitely the prepare.
+So they're aware, you know, you have reached out and the client also has direct contact then to reach out to that prepare to.
+And then just make sure you put in there when you last contacted the client in the project.
+So in that instance, unfortunately, the the admin assigned to that specific prepare will need to reach out.
+But the most part of the prepare is probably going to reach out themselves.
+But like Adam.
+I think really only Adam at this point is the only one that's probably going to be having to go through the admin to ask for assistance.
+Yeah, I was just like not sure what to do with that.
+Do you need to send the email or I can send the request from safe send.
+So probably I can learn like request more documents, but then I don't know sometimes it's easier in the email because I can just track that.
+Yeah. So if it's through safe send, I would just do it all one spot.
+I mean, you can let them know like, hey, we need this.
+This is the list. You know, please send us through your safe send client portal.
+You can certainly do it that way.
+Or you can do the document request via safe send as well.
+Yep. Okay. Thank you.
+That was one question. No more questions.
+You're welcome. Thank you.
+We'll go Annabelle and then we'll go Danielle.
+Can you hear me?
+Yep.
+You'll have to Erica probably mute her because there's an echo.
+I have a question I'm going on.
+I don't know.
+So she's column G the 2025 staff.
+So so in the GFR information tab.
+Would that column the name and that column G would that appear as if it's blank the information tab is blank.
+Would I write that one us and reviewer or and staff prepare at the same time if it's blank?
+If everything.
+Okay. So I think I understood what your question was because there was that that echo.
+So you're asking if the on the information tab if the reviewer and the staff prepare is blank and you go to the master excel on the staff 2025.
+Are they going to be the reviewer and staff prepare is that correct?
+Okay.
+So it also depends on who the PIC is.
+So let's so we'll use this example, right?
+So let's say keep this the PIC.
+But this is less blank and staff prepare is less blank.
+But in the Excel it states that.
+Drew is the staff prepare.
+So I would put Keith as the reviewer and I would put Drew as the staff prepare.
+If it's Keith on the if it was Keith on the Excel, then he would be all free of these.
+He would be the PIC.
+He would be the reviewer and he would be the staff prepare because he was already marked as the PIC.
+Okay.
+Does that make sense?
+If it's Amy and the information tab is blank, so should I put Amy as reviewer and Amy as staff prepare?
+Or should I because normally she doesn't prepare or should I always ask her who should assign who should I assign?
+So on the Excel is she listed as the staff prepare?
+Yes.
+Then she would be the staff prepare as well.
+Okay.
+And in the reason being is she is preparing some task returns.
+So from the start is she decides that she wants to move it over to Drew or to Keith.
+Then she can do that and she will have to or Keith or Drew will have to update the staff prepare in the task folder.
+Okay.
+Okay.
+Thank you.
+You're welcome.
+All right.
+Daniel.
+And then.
+I have.
+Dyliana and Collinda in my office.
+Good morning.
+I don't have anything.
+I don't think I'm just.
+Envoicing.
+P invoice.
+Cool.
+So.
+Okay.
+And is that moving along?
+Okay.
+Yes.
+Okay.
+Perfect.
+All right.
+Collinda.
+I have nothing.
+Nothing.
+Okay.
+Dyliana.
+You're good.
+All right.
+All right, ladies.
+I appreciate everyone.
+I know we're working as hard and quickly as possible.
+Just remember to to slow down and take a breath.
+Reach out to me if you have any questions.
+And I am leaving the office today.
+Two, three.
+Eastern time.
+We have.
+I'm wrapping up high school coaching.
+So we have districts today.
+I'll try to be off.
+Back online a little bit.
+Probably around.
+For 30 p.m.
+Eastern five.
+So be on and off with that.
+And then tomorrow.
+I am offline completely all day.
+So I'm turning off my teams.
+I'll have an away message up.
+Hopefully.
+I will answer emails.
+I'll probably might be forwarding to them over to somebody else to handle.
+But I will be back in the office on Thursday.
+Okay.
+All right.
+Thank you, ladies.
+Appreciate you guys.
+Thank you.
+Thank you.
