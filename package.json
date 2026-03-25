@@ -1,25 +1,38 @@
 {
   "name": "rhw-research-db",
-  "version": "0.1.0",
-  "description": "RHW CPAs Research & Knowledge Base - Firm-wide research database with SOPs, policies, and Q&A transcripts",
+  "version": "0.8.0",
+  "description": "RHW CPAs Research & Knowledge Base - Firm-wide research database with AI-powered search and Entra SSO",
   "private": true,
-  "workspaces": [
-    "frontend",
-    "api"
-  ],
   "scripts": {
-    "install-all": "npm install && npm install --workspace=frontend && npm install --workspace=api",
-    "dev": "npm run dev --workspace=frontend & npm run dev --workspace=api",
-    "dev:frontend": "npm run dev --workspace=frontend",
-    "dev:api": "npm run dev --workspace=api",
-    "build": "npm run build --workspace=frontend && npm run build --workspace=api",
-    "build:frontend": "npm run build --workspace=frontend",
-    "build:api": "npm run build --workspace=api",
-    "test": "npm run test --workspace=frontend && npm run test --workspace=api",
-    "test:frontend": "npm run test --workspace=frontend",
-    "test:api": "npm run test --workspace=api",
-    "lint": "npm run lint --workspace=frontend && npm run lint --workspace=api",
-    "type-check": "npm run type-check --workspace=frontend && npm run type-check --workspace=api"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "next": "^16.0.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "next-auth": "^5.0.0-beta.20",
+    "@azure/cosmos": "^4.0.0",
+    "uuid": "^13.0.0",
+    "ai": "^4.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0",
+    "@testing-library/react": "^14.3.0",
+    "@testing-library/jest-dom": "^6.1.0",
+    "vitest": "^1.6.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.0.0"
   },
   "engines": {
     "node": ">=18.0.0",
@@ -31,6 +44,9 @@
     "cpa",
     "rhw",
     "sop",
-    "policy"
+    "policy",
+    "ai",
+    "entra",
+    "sso"
   ]
 }

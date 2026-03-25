@@ -69,3 +69,11 @@ pids/
 *.tmp
 *.temp
 *.bak
+
+# Next.js
+.next/
+out/
+*.md.json
+
+# Vercel
+.vercel/
