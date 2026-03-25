@@ -13,9 +13,10 @@ describe('Search API Integration', () => {
     user: user || { email: 'user@rhwcpas.com', isAdmin: false }
   })
 
+  const logFn = vi.fn()
+  logFn.error = vi.fn()
   const mockContext = {
-    log: vi.fn(),
-    log: { error: vi.fn() }
+    log: logFn
   }
 
   beforeEach(() => {
