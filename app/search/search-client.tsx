@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react"
+import SummaryModal from "./summary-modal"
 
 interface ResearchEntry {
   id: string
@@ -23,6 +24,7 @@ export default function SearchClient({ session, onSignOut }: { session: any; onS
   const [entries, setEntries] = useState<ResearchEntry[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [loading, setLoading] = useState(true)
+  const [showSummaryModal, setShowSummaryModal] = useState(false)
 
   useEffect(() => {
     // Load research entries
@@ -85,7 +87,15 @@ export default function SearchClient({ session, onSignOut }: { session: any; onS
       <div className="max-w-6xl mx-auto px-4 py-12">
         {/* Search Box */}
         <div className="glass bg-slate-900/40 border border-slate-700/50 rounded-2xl p-8 backdrop-blur-sm mb-8">
-          <h2 className="text-xl font-semibold text-slate-200 mb-6">Research Database</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-slate-200">Research Database</h2>
+            <button
+              onClick={() => setShowSummaryModal(true)}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
+            >
+              📊 AI Summary
+            </button>
+          </div>
 
           <form onSubmit={handleSearch} className="space-y-4">
             <input
@@ -161,6 +171,15 @@ export default function SearchClient({ session, onSignOut }: { session: any; onS
           </div>
         </div>
       )}
+
+      {/* Summary Modal */}
+      <SummaryModal
+        isOpen={showSummaryModal}
+        onClose={() => setShowSummaryModal(false)}
+        suggestedTopics={Array.from(
+          new Set(entries.map((e) => e.topic))
+        ).sort()}
+      />
     </div>
   )
 }
