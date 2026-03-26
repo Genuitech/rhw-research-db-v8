@@ -6,10 +6,15 @@ import { useState } from "react"
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleSignIn = async () => {
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault()
     setIsLoading(true)
     try {
-      await signIn("azure-ad", {
+      // Use credentials provider for testing
+      const formData = new FormData(e.currentTarget as HTMLFormElement)
+      const result = await signIn("credentials", {
+        email: formData.get("email"),
+        password: formData.get("password"),
         redirect: true,
         callbackUrl: "/search",
       })
@@ -33,16 +38,33 @@ export default function SignInPage() {
 
         {/* Login Card */}
         <div className="glass bg-slate-900/40 border border-slate-700/50 rounded-2xl p-8 backdrop-blur-sm">
-          <div className="space-y-6">
+          <form onSubmit={handleSignIn} className="space-y-6">
             <div>
               <h2 className="text-xl font-semibold text-slate-200 mb-2">Sign In</h2>
               <p className="text-sm text-slate-400">
-                Use your RHW CPAs Entra ID account to continue
+                Test account (any email + password)
               </p>
             </div>
 
+            <div className="space-y-4">
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                required
+                className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-600 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-400"
+              />
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                required
+                className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-600 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-400"
+              />
+            </div>
+
             <button
-              onClick={handleSignIn}
+              type="submit"
               disabled={isLoading}
               className={`w-full px-4 py-3 rounded-lg font-semibold transition-all duration-200 ${
                 isLoading
@@ -50,19 +72,13 @@ export default function SignInPage() {
                   : "bg-gradient-to-r from-sky-500 to-blue-500 text-white hover:shadow-lg hover:shadow-blue-500/20 active:scale-95"
               }`}
             >
-              {isLoading ? "Signing in..." : "Sign In with Entra ID"}
+              {isLoading ? "Signing in..." : "Sign In"}
             </button>
 
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-slate-700/50"></div>
-              <span className="text-xs text-slate-500">Enterprise SSO</span>
-              <div className="flex-1 h-px bg-slate-700/50"></div>
-            </div>
-
             <p className="text-xs text-slate-500 text-center">
-              RHW CPAs staff only. Unauthorized access is prohibited.
+              Test credentials: any email + password combination
             </p>
-          </div>
+          </form>
         </div>
 
         {/* Footer */}
