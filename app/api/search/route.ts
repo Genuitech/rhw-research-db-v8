@@ -1,14 +1,27 @@
 import { auth } from "@/auth"
-import { CosmosClient } from "@azure/cosmos"
 import { NextRequest, NextResponse } from "next/server"
 
-const cosmosClient = new CosmosClient({
-  endpoint: process.env.COSMOS_DB_ENDPOINT || "",
-  key: process.env.COSMOS_DB_KEY || "",
-})
-
-const database = cosmosClient.database(process.env.COSMOS_DB_DATABASE || "rhw-research")
-const container = database.container("entries")
+// Mock data for Phase 8 testing
+const mockEntries = [
+  {
+    id: "1",
+    title: "Research Entry 1",
+    content: "This is a test research entry for tax procedures",
+    type: "tax",
+    status: "approved",
+    isPrivate: false,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "2",
+    title: "Research Entry 2",
+    content: "This is another test entry about accounting standards",
+    type: "accounting",
+    status: "approved",
+    isPrivate: false,
+    createdAt: new Date().toISOString(),
+  },
+]
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,48 +39,42 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "20")
     const offset = parseInt(searchParams.get("offset") || "0")
 
-    // Build query
-    let query = "SELECT * FROM c"
-    const conditions: string[] = []
+    // Filter mock data
+    let results = mockEntries
 
-    // Add status filter
+    // Status filter
     if (status && status !== "all") {
-      conditions.push(`c.status = "${status}"`)
+      results = results.filter((e: any) => e.status === status)
     }
 
-    // Add text search if provided
+    // Text search
     if (q) {
-      const escaped = q.replace(/"/g, '\\"')
-      conditions.push(`(CONTAINS(LOWER(c.content), LOWER("${escaped}")) OR CONTAINS(LOWER(c.title), LOWER("${escaped}"))`)
+      const lowerQ = q.toLowerCase()
+      results = results.filter((e: any) =>
+        e.content.toLowerCase().includes(lowerQ) ||
+        e.title.toLowerCase().includes(lowerQ)
+      )
     }
 
-    // Add type filter if provided
+    // Type filter
     if (type && type !== "all") {
-      conditions.push(`c.type = "${type}"`)
+      results = results.filter((e: any) => e.type === type)
     }
 
-    // Build final query
-    if (conditions.length > 0) {
-      query += ` WHERE ${conditions.join(" AND ")}`
-    }
-
-    // Add pagination
-    query += ` ORDER BY c.createdAt DESC OFFSET ${offset} LIMIT ${limit}`
-
-    // Execute query
-    const { resources } = await container.items.query(query).fetchAll()
-
-    // Check visibility rules - filter out private content for non-admin users
+    // Check visibility rules
     const isAdmin = session.user.isAdmin === true
-    const visibleEntries = resources.filter((entry: any) => {
+    const visibleEntries = results.filter((entry: any) => {
       // Admins see everything
       if (isAdmin) return true
-      // Staff see published entries, hide private conversation transcripts
+      // Staff see published entries
       return entry.status === "approved" && !entry.isPrivate
     })
 
+    // Apply pagination
+    const paginatedEntries = visibleEntries.slice(offset, offset + limit)
+
     return NextResponse.json({
-      data: visibleEntries,
+      data: paginatedEntries,
       total: visibleEntries.length,
       limit,
       offset,

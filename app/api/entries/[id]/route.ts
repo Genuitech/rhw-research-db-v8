@@ -1,14 +1,17 @@
 import { auth } from "@/auth"
-import { CosmosClient } from "@azure/cosmos"
 import { NextRequest, NextResponse } from "next/server"
 
-const cosmosClient = new CosmosClient({
-  endpoint: process.env.COSMOS_DB_ENDPOINT || "",
-  key: process.env.COSMOS_DB_KEY || "",
-})
-
-const database = cosmosClient.database(process.env.COSMOS_DB_DATABASE || "rhw-research")
-const container = database.container("entries")
+// Mock Cosmos DB for Phase 8 testing
+const mockEntries: Record<string, any> = {
+  "test-entry-1": {
+    id: "test-entry-1",
+    title: "Test Research Entry",
+    content: "This is a mock entry for Phase 8 testing",
+    topic: "testing",
+    status: "approved",
+    created_at: new Date().toISOString(),
+  },
+}
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -20,8 +23,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const { id } = await params
 
-    // Get entry
-    const { resource } = await container.item(id, id).read()
+    // Get entry from mock data
+    const resource = mockEntries[id]
 
     if (!resource) {
       return NextResponse.json({ error: "Not found" }, { status: 404 })
@@ -57,14 +60,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const body = await request.json()
     const { action, notes } = body // action: "approve" or "reject"
 
-    // Get existing entry
-    const { resource: entry } = await container.item(id, id).read()
+    // Get existing entry from mock data
+    const entry = mockEntries[id]
 
     if (!entry) {
       return NextResponse.json({ error: "Not found" }, { status: 404 })
     }
 
-    // Update status
+    // Update status in mock data
     const updatedEntry = {
       ...entry,
       status: action === "approve" ? "approved" : "rejected",
@@ -73,7 +76,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       approvalNotes: notes || "",
     }
 
-    await container.item(id, id).replace(updatedEntry)
+    // Store updated entry in mock data
+    mockEntries[id] = updatedEntry
 
     return NextResponse.json(updatedEntry)
   } catch (error) {
