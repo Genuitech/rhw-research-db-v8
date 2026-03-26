@@ -77,3 +77,4 @@ out/
 
 # Vercel
 .vercel/
+.vercel

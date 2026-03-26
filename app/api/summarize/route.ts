@@ -1,5 +1,6 @@
 import { auth } from "@/auth"
 import { NextRequest, NextResponse } from "next/server"
+import Anthropic from "@anthropic-ai/sdk"
 
 // Mock research entries
 const mockEntries = [
@@ -113,6 +114,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Use Claude API for real analysis
+    const client = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    })
+
     // Prepare documents for AI summarization
     const documentsText = matchingDocs
       .map(
@@ -121,82 +127,91 @@ export async function POST(request: NextRequest) {
       )
       .join("\n\n---\n\n")
 
-    // Mock AI response for Phase 9 demo (TODO: integrate with Claude API)
-    const mockSummaries: Record<string, any> = {
-      "education planning": {
-        summary:
-          "Section 529 plans are powerful education savings vehicles with significant tax advantages. The SECURE 2.0 law introduced major changes allowing up to $35,000 in aggregate rollovers to Roth IRAs with age limitations. These plans are most suitable for high-income clients planning education expenses, offering tax-free growth for qualified education expenses including tuition, fees, room and board, and books.",
-        keyPoints: [
-          "Tax-free growth for qualified education expenses",
-          "SECURE 2.0 allows $35,000 aggregate Roth IRA rollovers",
-          "Age restrictions apply to Roth conversion rollovers",
-          "Covers tuition, fees, room/board, and books",
-          "Suitable for high-income earners and education planning",
-        ],
-        contradictions: [],
-      },
-      "business taxation": {
-        summary:
-          "Pass-Through Entity Tax (PTET) elections offer significant planning opportunities for S-Corps, LLCs, and partnerships. Multiple states including Mississippi, Oklahoma, Tennessee, and Utah have implemented PTET options. The primary benefit is the federal deduction for state taxes paid, though these provisions include sunset dates (primarily 2025). This represents a notable planning window for multi-state business operations.",
-        keyPoints: [
-          "PTET available in Mississippi, Oklahoma, Tennessee, Utah",
-          "Applicable to S-Corps, LLCs, and partnerships",
-          "Federal deduction for state taxes paid",
-          "Sunset provisions ending in 2025",
-          "Strategic planning opportunity for multi-state businesses",
-        ],
-        contradictions: [],
-      },
-      "tax": {
-        summary:
-          "The research database contains comprehensive tax guidance covering education savings (529 plans), pass-through entity taxation, cryptocurrency treatment, state tax nexus, and digital asset taxation. Key themes include leveraging tax-efficient structures, understanding recent legislative changes (SECURE 2.0, state PTET elections), and managing compliance with evolving IRS enforcement priorities.",
-        keyPoints: [
-          "SECURE 2.0 fundamentally changed education savings rules",
-          "Multiple tax planning opportunities available in 2024-2025",
-          "State-level tax elections expanding (PTET options)",
-          "Cryptocurrency wash sale rules do NOT apply",
-          "IRS focusing on transactions over $10,000",
-        ],
-        contradictions: [
+    const prompt = `You are a professional research analyst for RHW CPAs. Analyze these ${matchingDocs.length} documents about "${topic}" and provide:
+
+1. A comprehensive summary of the key points across all documents
+2. 3-5 key points extracted from the documents
+3. Any contradictions or conflicting information between documents (include direct quotes with document numbers)
+
+Documents to analyze:
+${documentsText}
+
+Respond with ONLY valid JSON (no markdown, no code blocks) in this exact format:
+{
+  "summary": "paragraph summary here",
+  "keyPoints": ["point 1", "point 2", ...],
+  "contradictions": [
+    {
+      "issue": "description of contradiction",
+      "document1": {"id": "Document X title", "quote": "exact quote from doc"},
+      "document2": {"id": "Document Y title", "quote": "exact quote from doc"},
+      "severity": "HIGH"
+    }
+  ]
+}`
+
+    try {
+      const message = await client.messages.create({
+        model: "claude-opus-4",
+        max_tokens: 2000,
+        messages: [
           {
-            issue:
-              "SECURE 2.0 Roth rollover limits and timing constraints differ between documents",
-            document1: {
-              id: "1",
-              quote:
-                "up to $35,000 aggregate rollovers to Roth IRAs, age limits apply",
-            },
-            document2: {
-              id: "2",
-              quote:
-                "Planning opportunity for 2024 with sunset provisions in 2025",
-            },
-            severity: "MEDIUM",
+            role: "user",
+            content: prompt,
           },
         ],
-      },
+      })
+
+      const content = message.content[0]
+      if (content.type !== "text") {
+        throw new Error("Unexpected response type")
+      }
+
+      // Parse Claude's JSON response
+      let parsedResponse = {
+        summary: "",
+        keyPoints: [],
+        contradictions: [],
+      }
+      try {
+        // Extract JSON from response (handle any markdown wrapping)
+        const jsonStr = content.text
+          .replace(/```json\n?/g, "")
+          .replace(/```\n?/g, "")
+          .trim()
+        parsedResponse = JSON.parse(jsonStr)
+      } catch (parseError) {
+        console.error("Failed to parse Claude response:", content.text)
+        parsedResponse.summary = content.text
+      }
+
+      return NextResponse.json({
+        summary: parsedResponse.summary || "",
+        keyPoints: parsedResponse.keyPoints || [],
+        contradictions: parsedResponse.contradictions || [],
+        sources: matchingDocs.map((doc) => ({
+          id: doc.id,
+          title: doc.title,
+          author: doc.author,
+          topic: doc.topic,
+        })),
+      })
+    } catch (claudeError) {
+      console.error("Claude API error:", claudeError)
+      // Fallback to mock response if Claude API fails
+      return NextResponse.json({
+        summary:
+          "Claude API is temporarily unavailable. Showing summary based on document content analysis.",
+        keyPoints: matchingDocs.map((doc) => doc.title),
+        contradictions: [],
+        sources: matchingDocs.map((doc) => ({
+          id: doc.id,
+          title: doc.title,
+          author: doc.author,
+          topic: doc.topic,
+        })),
+      })
     }
-
-    const lowerQuery = topic.toLowerCase()
-    const mockResult =
-      mockSummaries[lowerQuery] ||
-      mockSummaries[
-        Object.keys(mockSummaries).find((key) =>
-          key.includes(lowerQuery.split(" ")[0])
-        ) || "tax"
-      ]
-
-    return NextResponse.json({
-      summary: mockResult.summary,
-      keyPoints: mockResult.keyPoints,
-      contradictions: mockResult.contradictions,
-      sources: matchingDocs.map((doc) => ({
-        id: doc.id,
-        title: doc.title,
-        author: doc.author,
-        topic: doc.topic,
-      })),
-    })
   } catch (error) {
     console.error("Summarize error:", error)
     return NextResponse.json(
