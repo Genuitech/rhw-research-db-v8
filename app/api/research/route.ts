@@ -1,36 +1,65 @@
 import { auth } from "@/auth"
 import { NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
+import { query } from "@/app/lib/db"
 
 const DAILY_LIMIT = 20
-
-// In-memory rate limiter keyed by userId — resets on server restart (fine for POC)
-const rateLimitStore = new Map<string, { count: number; date: string }>()
-
-// In-memory audit log — ⚠️ resets on server restart. Needs Neon DB for production persistence.
-interface AuditEntry {
-  timestamp: string
-  userId: string
-  email: string
-  question: string
-  model: string
-  queryNumber: number
-}
-const auditLog: AuditEntry[] = []
 
 function getTodayString() {
   return new Date().toISOString().split("T")[0]
 }
 
-function getRateLimitEntry(userId: string) {
+// Returns the new count after incrementing (atomic upsert).
+async function incrementRateLimit(userId: string): Promise<number> {
   const today = getTodayString()
-  const entry = rateLimitStore.get(userId)
-  if (!entry || entry.date !== today) {
-    const fresh = { count: 0, date: today }
-    rateLimitStore.set(userId, fresh)
-    return fresh
-  }
-  return entry
+  const rows = await query<{ count: number }>(
+    `INSERT INTO rate_limits (user_id, date, count)
+     VALUES ($1, $2, 1)
+     ON CONFLICT (user_id, date)
+     DO UPDATE SET count = rate_limits.count + 1
+     RETURNING count`,
+    [userId, today]
+  )
+  return rows[0].count
+}
+
+async function decrementRateLimit(userId: string): Promise<void> {
+  const today = getTodayString()
+  await query(
+    `UPDATE rate_limits
+     SET count = GREATEST(0, count - 1)
+     WHERE user_id = $1 AND date = $2`,
+    [userId, today]
+  )
+}
+
+async function getCurrentCount(userId: string): Promise<number> {
+  const today = getTodayString()
+  const rows = await query<{ count: number }>(
+    `SELECT count FROM rate_limits WHERE user_id = $1 AND date = $2`,
+    [userId, today]
+  )
+  return rows[0]?.count ?? 0
+}
+
+async function insertAuditLog(
+  userId: string,
+  email: string,
+  question: string,
+  model: string,
+  queryNumber: number
+): Promise<number> {
+  const rows = await query<{ id: number }>(
+    `INSERT INTO audit_log (user_id, email, question, model, query_number)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING id`,
+    [userId, email, question, model, queryNumber]
+  )
+  return rows[0].id
+}
+
+async function deleteAuditLogEntry(id: number): Promise<void> {
+  await query(`DELETE FROM audit_log WHERE id = $1`, [id])
 }
 
 const SYSTEM_PROMPT = `You are a research assistant for RHW CPAs, a professional accounting firm. Answer tax, accounting, and financial planning questions clearly and accurately for CPA professionals.
@@ -67,9 +96,11 @@ export async function POST(request: NextRequest) {
 
     const userId = session.user.id
     const email = session.user.email
-    const entry = getRateLimitEntry(userId)
 
-    if (entry.count >= DAILY_LIMIT) {
+    // Check current count before incrementing to avoid burning a query slot on
+    // a user who is already at the limit
+    const currentCount = await getCurrentCount(userId)
+    if (currentCount >= DAILY_LIMIT) {
       return NextResponse.json(
         {
           error: "Daily limit reached",
@@ -89,27 +120,17 @@ export async function POST(request: NextRequest) {
 
     const latestQuestion = messages[messages.length - 1].content.trim()
 
-    // Increment before streaming (prevents double-counting on retry)
-    entry.count += 1
-    rateLimitStore.set(userId, entry)
-
-    const remaining = DAILY_LIMIT - entry.count
+    // Atomically increment — get back the new count
+    const newCount = await incrementRateLimit(userId)
+    const remaining = DAILY_LIMIT - newCount
     const model = detailed ? "claude-sonnet-4-6" : "claude-haiku-4-5-20251001"
 
-    // Write audit log entry
-    auditLog.push({
-      timestamp: new Date().toISOString(),
-      userId,
-      email,
-      question: latestQuestion,
-      model,
-      queryNumber: entry.count,
-    })
-    console.log(`[AUDIT] ${email} — query ${entry.count}/${DAILY_LIMIT}: "${latestQuestion.slice(0, 80)}..."`)
+    // Write audit log and capture the row id for rollback on error
+    const auditId = await insertAuditLog(userId, email, latestQuestion, model, newCount)
+    console.log(`[AUDIT] ${email} — query ${newCount}/${DAILY_LIMIT}: "${latestQuestion.slice(0, 80)}"`)
 
     const client = new Anthropic()
 
-    // Stream the response
     const stream = new ReadableStream({
       async start(controller) {
         try {
@@ -129,16 +150,15 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          // Send metadata at end as a special marker
+          // Send rate-limit metadata as a trailing marker the client reads
           const meta = JSON.stringify({ remaining, limit: DAILY_LIMIT, model })
-          controller.enqueue(
-            new TextEncoder().encode(`\n\n__META__${meta}`)
-          )
+          controller.enqueue(new TextEncoder().encode(`\n\n__META__${meta}`))
         } catch (err) {
-          // Roll back count on error
-          entry.count = Math.max(0, entry.count - 1)
-          rateLimitStore.set(userId, entry)
-          auditLog.pop() // remove failed entry
+          // Roll back — undo the increment and remove the audit entry
+          await Promise.allSettled([
+            decrementRateLimit(userId),
+            deleteAuditLogEntry(auditId),
+          ])
           console.error("Anthropic stream error:", err)
           controller.enqueue(
             new TextEncoder().encode(
@@ -171,19 +191,24 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  // Admin-only: return audit log
+  // Admin-only: return audit log from DB
   const url = new URL(request.url)
   if (url.searchParams.get("audit") === "1") {
-    // @ts-ignore
-    const isAdmin = session.user?.isAdmin
+    const isAdmin = (session.user as any)?.isAdmin
     if (!isAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-    return NextResponse.json({ entries: auditLog, total: auditLog.length })
+    const entries = await query(
+      `SELECT id, created_at, user_id, email, question, model, query_number
+       FROM audit_log
+       ORDER BY created_at DESC
+       LIMIT 500`
+    )
+    return NextResponse.json({ entries, total: entries.length })
   }
 
-  const entry = getRateLimitEntry(session.user.id)
+  const count = await getCurrentCount(session.user.id)
   return NextResponse.json({
-    remaining: DAILY_LIMIT - entry.count,
-    used: entry.count,
+    remaining: DAILY_LIMIT - count,
+    used: count,
     limit: DAILY_LIMIT,
     resetsAt: getTodayString() + "T24:00:00Z",
   })
