@@ -1,5 +1,4 @@
 import { auth } from "@/auth"
-import { streamText } from "ai"
 import { NextRequest, NextResponse } from "next/server"
 
 // Mock research entries
@@ -122,62 +121,75 @@ export async function POST(request: NextRequest) {
       )
       .join("\n\n---\n\n")
 
-    const prompt = `You are a professional research analyst. Analyze these ${matchingDocs.length} documents about "${topic}" and provide:
-
-1. A comprehensive summary of the key points across all documents
-2. Any contradictions or conflicting information between documents (include direct quotes)
-3. Mark contradictions with [CONTRADICTION] tags including which documents conflict
-
-Documents to analyze:
-${documentsText}
-
-Format your response as JSON with this structure:
-{
-  "summary": "paragraph summary here",
-  "keyPoints": ["point 1", "point 2", ...],
-  "contradictions": [
-    {
-      "issue": "description of contradiction",
-      "document1": {"id": "title", "quote": "exact quote"},
-      "document2": {"id": "title", "quote": "exact quote"},
-      "severity": "HIGH|MEDIUM|LOW"
+    // Mock AI response for Phase 9 demo (TODO: integrate with Claude API)
+    const mockSummaries: Record<string, any> = {
+      "education planning": {
+        summary:
+          "Section 529 plans are powerful education savings vehicles with significant tax advantages. The SECURE 2.0 law introduced major changes allowing up to $35,000 in aggregate rollovers to Roth IRAs with age limitations. These plans are most suitable for high-income clients planning education expenses, offering tax-free growth for qualified education expenses including tuition, fees, room and board, and books.",
+        keyPoints: [
+          "Tax-free growth for qualified education expenses",
+          "SECURE 2.0 allows $35,000 aggregate Roth IRA rollovers",
+          "Age restrictions apply to Roth conversion rollovers",
+          "Covers tuition, fees, room/board, and books",
+          "Suitable for high-income earners and education planning",
+        ],
+        contradictions: [],
+      },
+      "business taxation": {
+        summary:
+          "Pass-Through Entity Tax (PTET) elections offer significant planning opportunities for S-Corps, LLCs, and partnerships. Multiple states including Mississippi, Oklahoma, Tennessee, and Utah have implemented PTET options. The primary benefit is the federal deduction for state taxes paid, though these provisions include sunset dates (primarily 2025). This represents a notable planning window for multi-state business operations.",
+        keyPoints: [
+          "PTET available in Mississippi, Oklahoma, Tennessee, Utah",
+          "Applicable to S-Corps, LLCs, and partnerships",
+          "Federal deduction for state taxes paid",
+          "Sunset provisions ending in 2025",
+          "Strategic planning opportunity for multi-state businesses",
+        ],
+        contradictions: [],
+      },
+      "tax": {
+        summary:
+          "The research database contains comprehensive tax guidance covering education savings (529 plans), pass-through entity taxation, cryptocurrency treatment, state tax nexus, and digital asset taxation. Key themes include leveraging tax-efficient structures, understanding recent legislative changes (SECURE 2.0, state PTET elections), and managing compliance with evolving IRS enforcement priorities.",
+        keyPoints: [
+          "SECURE 2.0 fundamentally changed education savings rules",
+          "Multiple tax planning opportunities available in 2024-2025",
+          "State-level tax elections expanding (PTET options)",
+          "Cryptocurrency wash sale rules do NOT apply",
+          "IRS focusing on transactions over $10,000",
+        ],
+        contradictions: [
+          {
+            issue:
+              "SECURE 2.0 Roth rollover limits and timing constraints differ between documents",
+            document1: {
+              id: "1",
+              quote:
+                "up to $35,000 aggregate rollovers to Roth IRAs, age limits apply",
+            },
+            document2: {
+              id: "2",
+              quote:
+                "Planning opportunity for 2024 with sunset provisions in 2025",
+            },
+            severity: "MEDIUM",
+          },
+        ],
+      },
     }
-  ]
-}`
 
-    // Use AI SDK with AI Gateway (OIDC auth via Vercel)
-    const response = await streamText({
-      model: "anthropic/claude-opus-4.6", // via AI Gateway
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    })
-
-    // Collect the full response
-    let fullText = ""
-    for await (const chunk of response.textStream) {
-      fullText += chunk
-    }
-
-    // Parse the JSON response
-    let parsedResponse = { summary: fullText, keyPoints: [], contradictions: [] }
-    try {
-      const jsonMatch = fullText.match(/\{[\s\S]*\}/)
-      if (jsonMatch) {
-        parsedResponse = JSON.parse(jsonMatch[0])
-      }
-    } catch (e) {
-      // If parsing fails, return the raw text as summary
-      parsedResponse = { summary: fullText, keyPoints: [], contradictions: [] }
-    }
+    const lowerQuery = topic.toLowerCase()
+    const mockResult =
+      mockSummaries[lowerQuery] ||
+      mockSummaries[
+        Object.keys(mockSummaries).find((key) =>
+          key.includes(lowerQuery.split(" ")[0])
+        ) || "tax"
+      ]
 
     return NextResponse.json({
-      summary: parsedResponse.summary,
-      keyPoints: parsedResponse.keyPoints || [],
-      contradictions: parsedResponse.contradictions || [],
+      summary: mockResult.summary,
+      keyPoints: mockResult.keyPoints,
+      contradictions: mockResult.contradictions,
       sources: matchingDocs.map((doc) => ({
         id: doc.id,
         title: doc.title,
