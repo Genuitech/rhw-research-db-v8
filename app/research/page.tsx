@@ -9,13 +9,32 @@ import React from "react"
 // ─── Trusted source highlighting ────────────────────────────────────────────
 
 const TRUSTED_DOMAINS = [
+  // Federal
   "irs.gov", "taxcourt.gov", "treasury.gov", "law.cornell.edu",
-  "ftb.ca.gov", "dor.", "revenue.state", "tax.ohio", "tax.colorado",
-  "revenue.wi", "revenue.pa", "tax.ny", "taxes.state",
+  // Professional research platforms
+  "checkpoint.thomsonreuters.com", "answerconnect.cch.com",
+  "cchaxcess.wolterskluwer.com", "research.cchgroup.com",
+  // Standards bodies
+  "aicpa.org", "fasb.org", "pcaobus.org", "sec.gov",
+  // State — California
+  "ftb.ca.gov", "cdtfa.ca.gov",
+  // State — Ohio
+  "tax.ohio.gov",
+  // State — New York
+  "tax.ny.gov",
+  // State — Pennsylvania
+  "revenue.pa.gov",
+  // State — Wisconsin
+  "revenue.wi.gov",
+  // State — Colorado
+  "tax.colorado.gov",
+  // State — generic patterns (covers most other states)
+  "dor.", "revenue.state", "taxes.state",
 ]
 
-// Matches IRS, IRC sections, Tax Court, Treasury Regs, Rev. Proc., Rev. Rul.
-const TRUSTED_PATTERN = /(IRS(?:\s+(?:Publication|Pub\.?|Notice|Announcement|Form)\s+[\w.-]+)?|IRC\s+(?:Section\s+|§\s*)?\d+[A-Za-z()]*|§\s*\d+[A-Za-z()]*|Treasury\s+Reg(?:ulation)?s?(?:\s*§\s*[\d.]+)?|Treas\.\s*Reg\.?(?:\s*§?\s*[\d.]+)?|Tax\s+Court(?:\s+Memo(?:randum)?)?|U\.S\.\s+Tax\s+Court|Revenue\s+Proc(?:edure)?\.?\s+[\d-]+|Revenue\s+Rul(?:ing)?\.?\s+[\d-]+|Rev\.\s*Proc\.\s*[\d-]+|Rev\.\s*Rul\.\s*[\d-]+)/g
+// Matches IRS, IRC sections, Tax Court, Treasury Regs, Rev. Proc., Rev. Rul.,
+// PLRs, AICPA, FASB ASC, Thomson Reuters, CCH, SEC
+const TRUSTED_PATTERN = /(IRS(?:\s+(?:Publication|Pub\.?|Notice|Announcement|Form)\s+[\w.-]+)?|IRC\s+(?:Section\s+|§\s*)?\d+[A-Za-z()]*|§\s*\d+[A-Za-z()]*|Treasury\s+Reg(?:ulation)?s?(?:\s*§\s*[\d.]+)?|Treas\.\s*Reg\.?(?:\s*§?\s*[\d.]+)?|Tax\s+Court(?:\s+Memo(?:randum)?)?|U\.S\.\s+Tax\s+Court|Revenue\s+Proc(?:edure)?\.?\s+[\d-]+|Revenue\s+Rul(?:ing)?\.?\s+[\d-]+|Rev\.\s*Proc\.\s*[\d-]+|Rev\.\s*Rul\.\s*[\d-]+|P\.?L\.?R\.?\s*\d+|Private\s+Letter\s+Ruling\s*\d*|Technical\s+Advice\s+Memo(?:randum)?\s*\d*|T\.?A\.?M\.?\s*\d+|AICPA(?:\s+(?:Statement|Interpretation|Guidance|Ethics\s+Rule|SAS|SSARS|SSAE)\s+[\w.-]+)?|FASB\s+ASC\s*[\d-]+|ASC\s+\d{3}(?:-\d+)*|GAAP|GAAS|IFRS(?:\s+\d+)?|SEC(?:\s+(?:Release|Rule|Regulation|Form|Staff\s+Accounting\s+Bulletin|SAB)\s+[\w.-]+)?|Thomson\s+Reuters\s+Checkpoint|CCH\s+(?:AnswerConnect|Axcess|IntelliConnect)|Wolters\s+Kluwer)/g
 
 function isTrustedLink(href?: string) {
   if (!href) return false
