@@ -19,7 +19,7 @@ interface SearchResponse {
   total: number
 }
 
-export default function SearchClient({ session, signOut }: any) {
+export default function SearchClient({ session, onSignOut }: { session: any; onSignOut: () => Promise<void> }) {
   const [entries, setEntries] = useState<ResearchEntry[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [loading, setLoading] = useState(true)
@@ -60,9 +60,6 @@ export default function SearchClient({ session, signOut }: any) {
     }
   }
 
-  const handleSignOut = async () => {
-    await signOut({ redirectTo: "/auth/signin" })
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
@@ -73,12 +70,7 @@ export default function SearchClient({ session, signOut }: any) {
             <h1 className="text-2xl font-bold text-slate-100">RHW Research</h1>
             <p className="text-sm text-slate-400">{session?.user?.email}</p>
           </div>
-          <form
-            action={async () => {
-              "use server"
-              await signOut({ redirectTo: "/auth/signin" })
-            }}
-          >
+          <form action={onSignOut}>
             <button
               type="submit"
               className="px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors"
