@@ -4,6 +4,82 @@ import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import ReactMarkdown from "react-markdown"
+import React from "react"
+
+// ─── Trusted source highlighting ────────────────────────────────────────────
+
+const TRUSTED_DOMAINS = [
+  "irs.gov", "taxcourt.gov", "treasury.gov", "law.cornell.edu",
+  "ftb.ca.gov", "dor.", "revenue.state", "tax.ohio", "tax.colorado",
+  "revenue.wi", "revenue.pa", "tax.ny", "taxes.state",
+]
+
+// Matches IRS, IRC sections, Tax Court, Treasury Regs, Rev. Proc., Rev. Rul.
+const TRUSTED_PATTERN = /(IRS(?:\s+(?:Publication|Pub\.?|Notice|Announcement|Form)\s+[\w.-]+)?|IRC\s+(?:Section\s+|§\s*)?\d+[A-Za-z()]*|§\s*\d+[A-Za-z()]*|Treasury\s+Reg(?:ulation)?s?(?:\s*§\s*[\d.]+)?|Treas\.\s*Reg\.?(?:\s*§?\s*[\d.]+)?|Tax\s+Court(?:\s+Memo(?:randum)?)?|U\.S\.\s+Tax\s+Court|Revenue\s+Proc(?:edure)?\.?\s+[\d-]+|Revenue\s+Rul(?:ing)?\.?\s+[\d-]+|Rev\.\s*Proc\.\s*[\d-]+|Rev\.\s*Rul\.\s*[\d-]+)/g
+
+function isTrustedLink(href?: string) {
+  if (!href) return false
+  return TRUSTED_DOMAINS.some((d) => href.includes(d))
+}
+
+function highlightTrustedText(text: string): React.ReactNode {
+  const pattern = new RegExp(TRUSTED_PATTERN.source, "g")
+  const parts: React.ReactNode[] = []
+  let lastIndex = 0
+
+  for (const match of text.matchAll(pattern)) {
+    if (match.index! > lastIndex) parts.push(text.slice(lastIndex, match.index))
+    parts.push(
+      <mark
+        key={match.index}
+        className="bg-yellow-400/20 text-yellow-200 border border-yellow-400/40 rounded-sm px-1 font-medium not-italic"
+        title="Official source citation"
+      >
+        {match[0]}
+      </mark>
+    )
+    lastIndex = match.index! + match[0].length
+  }
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex))
+  return parts.length > 1 ? <>{parts}</> : text
+}
+
+function processChildren(children: React.ReactNode): React.ReactNode {
+  return React.Children.map(children, (child) =>
+    typeof child === "string" ? highlightTrustedText(child) : child
+  )
+}
+
+const markdownComponents = {
+  p: ({ children }: { children?: React.ReactNode }) => (
+    <p>{processChildren(children)}</p>
+  ),
+  li: ({ children }: { children?: React.ReactNode }) => (
+    <li>{processChildren(children)}</li>
+  ),
+  strong: ({ children }: { children?: React.ReactNode }) => (
+    <strong>{processChildren(children)}</strong>
+  ),
+  a: ({ href, children }: { href?: string; children?: React.ReactNode }) => {
+    if (isTrustedLink(href)) {
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 bg-yellow-400/20 border border-yellow-400/40 text-yellow-200 rounded px-1.5 py-0.5 font-medium hover:bg-yellow-400/30 transition-colors no-underline"
+        >
+          🛡 {children}
+        </a>
+      )
+    }
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:text-sky-300 underline">
+        {children}
+      </a>
+    )
+  },
+}
 
 function MessageActions({ content, question }: { content: string; question: string }) {
   const [copied, setCopied] = useState(false)
@@ -200,7 +276,12 @@ export default function ResearchPage() {
             </Link>
             <div>
               <h1 className="text-2xl font-bold text-slate-100">AI Research</h1>
-              <p className="text-xs text-slate-500">CPA-focused tax &amp; accounting assistant</p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <p className="text-xs text-slate-500">CPA-focused tax &amp; accounting assistant</p>
+                <span className="hidden sm:inline-flex items-center gap-1 text-xs bg-yellow-400/15 border border-yellow-400/30 text-yellow-300 rounded px-1.5 py-0.5">
+                  🛡 = official source
+                </span>
+              </div>
             </div>
           </div>
 
@@ -270,7 +351,7 @@ export default function ResearchPage() {
                 }`}
               >
                 {msg.role === "user" ? msg.content : (
-                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  <ReactMarkdown components={markdownComponents}>{msg.content}</ReactMarkdown>
                 )}
                 {msg.role === "assistant" && streaming && i === messages.length - 1 && (
                   <span className="inline-block w-1.5 h-4 bg-sky-400 animate-pulse ml-0.5 rounded-sm align-text-bottom" />
