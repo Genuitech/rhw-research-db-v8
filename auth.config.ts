@@ -24,6 +24,11 @@ export const authConfig: NextAuthConfig = {
       if (user) {
         token.isAdmin = process.env.ADMIN_EMAILS?.split(",").includes(user.email || "") ?? false
       }
+      // Initialize research rate limit tracking if missing
+      if (token.researchDate === undefined) {
+        token.researchDate = ""
+        token.researchQueries = 0
+      }
       return token
     },
     async session({ session, token }) {
@@ -31,6 +36,10 @@ export const authConfig: NextAuthConfig = {
         session.user.id = token.sub || ""
         // @ts-ignore - extend session type
         session.user.isAdmin = token.isAdmin || false
+        // @ts-ignore - extend session type
+        session.user.researchQueries = token.researchQueries ?? 0
+        // @ts-ignore - extend session type
+        session.user.researchDate = token.researchDate ?? ""
       }
       return session
     },

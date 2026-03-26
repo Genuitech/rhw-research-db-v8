@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import SummaryModal from "./summary-modal"
 
 interface ResearchEntry {
@@ -72,14 +73,22 @@ export default function SearchClient({ session, onSignOut }: { session: any; onS
             <h1 className="text-2xl font-bold text-slate-100">RHW Research</h1>
             <p className="text-sm text-slate-400">{session?.user?.email}</p>
           </div>
-          <form action={onSignOut}>
-            <button
-              type="submit"
-              className="px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors"
+          <div className="flex items-center gap-3">
+            <Link
+              href="/research"
+              className="px-4 py-2 text-sm font-medium text-sky-400 hover:text-sky-300 hover:bg-sky-950/50 rounded-lg transition-colors border border-sky-500/30 hover:border-sky-400/50"
             >
-              Sign Out
-            </button>
-          </form>
+              ✦ AI Research
+            </Link>
+            <form action={onSignOut}>
+              <button
+                type="submit"
+                className="px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                Sign Out
+              </button>
+            </form>
+          </div>
         </div>
       </div>
 

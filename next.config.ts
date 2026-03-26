@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     tsconfigPath: './tsconfig.json',
   },
   reactStrictMode: true,
+  serverExternalPackages: ['@anthropic-ai/sdk'],
 }
 
 export default nextConfig
