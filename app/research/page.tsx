@@ -287,21 +287,27 @@ export default function ResearchPage() {
       <div className="border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link
-              href="/search"
-              className="text-slate-400 hover:text-slate-200 transition-colors text-sm"
-            >
-              ← Knowledge Base
-            </Link>
-            <div>
-              <h1 className="text-2xl font-bold text-slate-100">AI Research</h1>
-              <div className="flex items-center gap-2 mt-0.5">
-                <p className="text-xs text-slate-500">CPA-focused tax &amp; accounting assistant</p>
-                <span className="hidden sm:inline-flex items-center gap-1 text-xs bg-yellow-400/15 border border-yellow-400/30 text-yellow-300 rounded px-1.5 py-0.5">
-                  🛡 = official source
-                </span>
-              </div>
+            <div className="flex gap-1">
+              <Link
+                href="/search"
+                className="px-3 py-1.5 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-lg transition-colors"
+              >
+                Document Search
+              </Link>
+              <span className="px-3 py-1.5 text-sm font-semibold text-sky-300 bg-sky-950/60 border border-sky-500/30 rounded-lg flex items-center gap-1.5">
+                <span className="text-sky-400">✦</span> AI Research
+              </span>
+              <span className="px-3 py-1.5 text-sm font-medium text-slate-600 rounded-lg flex items-center gap-1.5">
+                HR Documents
+                <span className="text-[10px] bg-slate-800 text-slate-500 border border-slate-700 rounded px-1 py-0.5">Soon</span>
+              </span>
             </div>
+          </div>
+          <div className="hidden sm:flex items-center gap-2">
+            <p className="text-xs text-slate-500">CPA-focused assistant</p>
+            <span className="inline-flex items-center gap-1 text-xs bg-yellow-400/15 border border-yellow-400/30 text-yellow-300 rounded px-1.5 py-0.5">
+              🛡 = official source
+            </span>
           </div>
 
           {/* Usage meter */}
