@@ -8,7 +8,19 @@ function getTodayString() {
   return new Date().toISOString().split("T")[0]
 }
 
-function getClientIp(request: NextRequest): string {
+/**
+ * Get the user identifier for rate limiting and auditing.
+ * Priority:
+ *   1. REMOTE_USER header (set by IIS with Windows Authentication enabled)
+ *   2. Client IP address (fallback when IIS auth not available)
+ */
+function getUserId(request: NextRequest): string {
+  const remoteUser = request.headers.get("remote-user")
+  if (remoteUser) {
+    return remoteUser // e.g., "RHWCPAS\jsmith"
+  }
+
+  // Fallback to IP address
   return (
     request.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
     request.headers.get("x-real-ip") ??
@@ -94,7 +106,7 @@ interface ChatMessage {
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = getClientIp(request)
+    const ip = getUserId(request)
 
     const currentCount = await getCurrentCount(ip)
     if (currentCount >= DAILY_LIMIT) {
@@ -179,7 +191,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const ip = getClientIp(request)
+  const ip = getUserId(request)
   const count = await getCurrentCount(ip)
   return NextResponse.json({
     remaining: DAILY_LIMIT - count,

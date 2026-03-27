@@ -1,0 +1,28 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "FUNCTIONS_EXTENSION_VERSION": "~4",
+    "COSMOS_ENDPOINT": "https://<your-cosmos-account>.documents.azure.com:443/",
+    "COSMOS_KEY": "your-cosmos-key",
+    "AZURE_TENANT_ID": "your-tenant-id",
+    "AZURE_CLIENT_ID": "your-client-id",
+    "AZURE_CLIENT_SECRET": "your-client-secret",
+    "SENDGRID_API_KEY": "your-sendgrid-api-key",
+    "INGEST_API_KEY": "rhw_ingest_key_replace_with_actual_key",
+    "ADMIN_EMAIL": "cromine@rhwcpas.com",
+    "NODE_ENV": "development"
+  },
+  "Host": {
+    "CORS": {
+      "AllowedOrigins": [
+        "http://localhost:3000",
+        "http://localhost:5173"
+      ]
+    },
+    "LogLevel": {
+      "default": "Information"
+    }
+  }
+}

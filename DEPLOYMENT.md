@@ -105,9 +105,12 @@ pm2 stop rhw-research
 
 The app runs on port 3000. Expose it on port 80/443 via a reverse proxy.
 
-### IIS (with URL Rewrite + ARR)
+### IIS (with URL Rewrite + ARR + Windows Authentication)
 
-Install **Application Request Routing** and **URL Rewrite** modules, then add to `web.config`:
+Install **Application Request Routing** and **URL Rewrite** modules, then configure in IIS Manager:
+
+1. **Authentication**: Disable Anonymous, enable **Windows Authentication**
+2. Add to `web.config`:
 
 ```xml
 <configuration>
@@ -117,12 +120,17 @@ Install **Application Request Routing** and **URL Rewrite** modules, then add to
         <rule name="RHW Research" stopProcessing="true">
           <match url="(.*)" />
           <action type="Rewrite" url="http://localhost:3000/{R:1}" />
+          <serverVariables>
+            <set name="HTTP_REMOTE_USER" value="{REMOTE_USER}" />
+          </serverVariables>
         </rule>
       </rules>
     </rewrite>
   </system.webServer>
 </configuration>
 ```
+
+This passes the Windows domain username (e.g., `RHWCPAS\jsmith`) to the backend app, which uses it for rate limiting and audit logs instead of IP address. The app seamlessly falls back to IP address if the header is missing (e.g., for API-only calls or when IIS auth is disabled).
 
 ### nginx (if installed)
 
@@ -131,12 +139,15 @@ server {
     listen 80;
     server_name rhw-research.yourdomain.com;
 
+    # If using Windows auth at the nginx level (via SSPI/GSSAPI module),
+    # forward the authenticated user to the backend:
     location / {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
+        proxy_set_header Remote-User $remote_user;  # Pass auth username if available
         proxy_cache_bypass $http_upgrade;
     }
 }
@@ -199,19 +210,25 @@ Database migrations (if any) will be noted in the release notes with SQL to run.
 
 ## 8. Admin Features
 
-- **Audit log:** The `audit_log` table in Postgres records **IP address**, question, model, and timestamp for every AI Research query. Queries are traceable to a workstation IP but not to a named user account (no login = no username).
-- **Daily AI query limit:** 20 queries per IP per day — change `DAILY_LIMIT` in `app/api/research/route.ts` and rebuild.
+- **Audit log:** The `audit_log` table in Postgres records either the Windows domain username (if IIS auth is enabled) or client IP address, along with the question, model, and timestamp for every AI Research query.
+  - **Without IIS Windows Auth:** Queries are traceable to workstation IP only (e.g., `192.168.1.45`).
+  - **With IIS Windows Auth:** Queries show the domain user (e.g., `RHWCPAS\jsmith`), answering "who searched for what" directly.
+- **Daily AI query limit:** 20 queries per user (or IP) per day — change `DAILY_LIMIT` in `app/api/research/route.ts` and rebuild. The limit is enforced per domain user if IIS auth is on, per IP if off.
 
 ### Optional: Per-User Audit Trail via IIS Windows Authentication
 
-If you need logs showing *which employee* ran each query (e.g., for compliance), IIS can silently authenticate users against your Windows domain — **no login page, no password prompt**. Each employee's existing Windows domain login is passed automatically by the browser.
+If you need logs showing *which employee* ran each query (e.g., for compliance), enable Windows Authentication in IIS — **no app code changes, no login page, no password prompt**. Each employee's existing Windows domain login is passed automatically by the browser.
 
 To enable:
-1. In IIS Manager → site → **Authentication** → disable Anonymous Authentication, enable **Windows Authentication**.
-2. IIS access logs will then contain the domain username (e.g., `RHWCPAS\jsmith`) for every request.
-3. No code changes are required — the app still works without a login page; IIS handles identity transparently.
+1. In IIS Manager → site → **Authentication** → disable Anonymous, enable **Windows Authentication**.
+2. Update `web.config` with the `<serverVariables>` block shown in § Reverse Proxy above.
+3. Immediately, the app will:
+   - Show domain usernames in `audit_log` instead of IPs
+   - Enforce rate limits per user instead of per IP
+   - Use domain user for all audit trails and activity tracking
+4. No rebuild required — the app detects the `REMOTE_USER` header automatically.
 
-This is the recommended approach if your compliance requirements later call for named audit records.
+This is the recommended approach if your compliance requirements call for named audit records.
 
 ---
 
