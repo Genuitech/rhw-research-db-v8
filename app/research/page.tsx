@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 import ReactMarkdown from "react-markdown"
 import React from "react"
@@ -182,18 +181,14 @@ export default function ResearchPage() {
   const [error, setError] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const router = useRouter()
 
   // Load usage on mount
   useEffect(() => {
     fetch("/api/research")
-      .then((r) => {
-        if (r.status === 401) { router.push("/auth/signin"); return null }
-        return r.json()
-      })
-      .then((data) => data && setRateLimit(data))
+      .then((r) => r.json())
+      .then((data) => setRateLimit(data))
       .catch(() => {})
-  }, [router])
+  }, [])
 
   // Scroll to bottom on new messages
   useEffect(() => {

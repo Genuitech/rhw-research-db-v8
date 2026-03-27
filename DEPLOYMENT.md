@@ -199,8 +199,19 @@ Database migrations (if any) will be noted in the release notes with SQL to run.
 
 ## 8. Admin Features
 
-- **Audit log:** View the `audit_log` table directly in Postgres — records IP, question, model, and timestamp for every AI Research query.
+- **Audit log:** The `audit_log` table in Postgres records **IP address**, question, model, and timestamp for every AI Research query. Queries are traceable to a workstation IP but not to a named user account (no login = no username).
 - **Daily AI query limit:** 20 queries per IP per day — change `DAILY_LIMIT` in `app/api/research/route.ts` and rebuild.
+
+### Optional: Per-User Audit Trail via IIS Windows Authentication
+
+If you need logs showing *which employee* ran each query (e.g., for compliance), IIS can silently authenticate users against your Windows domain — **no login page, no password prompt**. Each employee's existing Windows domain login is passed automatically by the browser.
+
+To enable:
+1. In IIS Manager → site → **Authentication** → disable Anonymous Authentication, enable **Windows Authentication**.
+2. IIS access logs will then contain the domain username (e.g., `RHWCPAS\jsmith`) for every request.
+3. No code changes are required — the app still works without a login page; IIS handles identity transparently.
+
+This is the recommended approach if your compliance requirements later call for named audit records.
 
 ---
 
