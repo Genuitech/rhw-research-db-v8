@@ -10,13 +10,24 @@ The portal has two components that share one Azure Postgres database:
 
 ---
 
+## Security Model
+
+**No login is required.** The portal is designed for internal use only and relies on network-level security:
+
+- The app runs on the internal server and is only accessible from inside the office network (or VPN).
+- The Azure VM's network security group (firewall) blocks all external traffic on port 3000/80/443.
+- No Azure AD / SSO integration is needed.
+
+AI Research queries are rate-limited by IP address — 20 queries per IP per day.
+
+---
+
 ## Prerequisites
 
 - Windows Server 2019+ or Windows 10/11
 - Node.js 20 LTS — https://nodejs.org/en/download
 - PM2 (process manager): `npm install -g pm2`
 - Access to the Azure Postgres instance (see IT ticket)
-- Azure AD App Registration (see section below)
 
 ---
 
@@ -39,43 +50,17 @@ This creates: `rate_limits`, `audit_log`, `files` (+ pgvector extension).
 Create a file named `.env.local` in the project root (copy from `.env.example`):
 
 ```
-AUTH_SECRET=<generate with: openssl rand -base64 32>
-
-AZURE_AD_CLIENT_ID=83159ec2-b03e-415f-bf65-5fa7376190fb
-AZURE_AD_TENANT_ID=22913123-1e6a-4c00-b1fd-779c28d3a076
-AZURE_AD_CLIENT_SECRET=<from Azure Portal → App Registration → Certificates & Secrets>
-
 DATABASE_URL=postgresql://rhwadmin:<PASSWORD>@rhw-research.postgres.database.azure.com/rhw_research?sslmode=require
 
 ANTHROPIC_API_KEY=<from console.anthropic.com>
 OPENAI_API_KEY=<from platform.openai.com>
-
-ADMIN_EMAILS=cromine@rhwcpas.com
-
-NEXTAUTH_URL=https://<your-internal-hostname-or-IP>
 ```
 
 > **Security:** `.env.local` is git-ignored. Never commit it. Set these as System Environment Variables on the VM if preferred — Next.js reads both.
 
 ---
 
-## 3. Azure AD App Registration
-
-This allows staff to sign in with their RHW Microsoft accounts.
-
-1. Azure Portal → **Azure Active Directory** → **App registrations** → **New registration**
-2. Name: `RHW Research Portal`
-3. Supported account types: **Accounts in this organizational directory only**
-4. Redirect URI (Web): `https://<your-hostname>/api/auth/callback/microsoft-entra-id`
-5. Click **Register**
-6. Copy the **Application (client) ID** → `AZURE_AD_CLIENT_ID`
-7. Copy the **Directory (tenant) ID** → `AZURE_AD_TENANT_ID`
-8. Go to **Certificates & secrets** → **New client secret** → Copy value → `AZURE_AD_CLIENT_SECRET`
-9. Go to **API permissions** → verify **Microsoft Graph → User.Read** is present (it is by default)
-
----
-
-## 4. Install & Build
+## 3. Install & Build
 
 ```bash
 cd C:\path\to\rhw-research-db
@@ -87,7 +72,7 @@ Build output goes to `.next/`. This step only needs to be re-run when the app co
 
 ---
 
-## 5. Start with PM2
+## 4. Start with PM2
 
 ```bash
 # Start the app
@@ -116,7 +101,7 @@ pm2 stop rhw-research
 
 ---
 
-## 6. Reverse Proxy (IIS or nginx)
+## 5. Reverse Proxy (IIS or nginx)
 
 The app runs on port 3000. Expose it on port 80/443 via a reverse proxy.
 
@@ -159,7 +144,7 @@ server {
 
 ---
 
-## 7. File Server Crawler
+## 6. File Server Crawler
 
 The crawler indexes P:\Data into the shared Postgres database. Run it on the **same VM** that has access to the P: drive.
 
@@ -196,7 +181,7 @@ The crawler uses SHA-256 change detection — only new/modified files are re-ind
 
 ---
 
-## 8. Updating the App
+## 7. Updating the App
 
 When a new version is deployed:
 
@@ -212,24 +197,23 @@ Database migrations (if any) will be noted in the release notes with SQL to run.
 
 ---
 
-## 9. Admin Features
+## 8. Admin Features
 
-- **Audit log:** `GET https://<hostname>/api/research?audit=1` (admin accounts only)
-- **Admin accounts:** Set `ADMIN_EMAILS=email1@rhwcpas.com,email2@rhwcpas.com` in `.env.local`
-- **Daily AI query limit:** 20 queries/user/day — change `DAILY_LIMIT` in `app/api/research/route.ts` and rebuild
+- **Audit log:** View the `audit_log` table directly in Postgres — records IP, question, model, and timestamp for every AI Research query.
+- **Daily AI query limit:** 20 queries per IP per day — change `DAILY_LIMIT` in `app/api/research/route.ts` and rebuild.
 
 ---
 
-## 10. Troubleshooting
+## 9. Troubleshooting
 
 | Symptom | Check |
 |---------|-------|
-| Sign-in fails with "Configuration" error | `AZURE_AD_CLIENT_SECRET` expired or wrong. Regenerate in Azure Portal. |
-| Sign-in fails with "AccessDenied" | User's Microsoft account is not in the RHW Azure AD tenant. |
+| Page won't load | Check `pm2 status` and `pm2 logs rhw-research`. Ensure port 3000 is reachable from the client machine. |
 | "Database connection failed" in logs | `DATABASE_URL` wrong, or Azure Postgres firewall blocking the VM's IP. Add VM IP under Azure Postgres → Networking → Firewall rules. |
 | Document search shows no results | Crawler hasn't run yet, or `DATABASE_URL` in crawler doesn't match the web app. |
 | AI Research returns errors | `ANTHROPIC_API_KEY` missing or expired. |
 | Embeddings fail during search | `OPENAI_API_KEY` missing or rate-limited. |
+| "Daily limit reached" error | IP has hit 20 AI Research queries today. Resets at midnight UTC. Increase `DAILY_LIMIT` if needed. |
 
 ---
 

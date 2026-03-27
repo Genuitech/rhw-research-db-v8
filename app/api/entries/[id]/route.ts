@@ -1,4 +1,3 @@
-import { auth } from "@/auth"
 import { NextRequest, NextResponse } from "next/server"
 import { query } from "@/app/lib/db"
 
@@ -7,11 +6,6 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth()
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
     const { id } = await params
     const numericId = parseInt(id, 10)
     if (isNaN(numericId)) {

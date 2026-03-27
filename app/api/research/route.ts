@@ -1,4 +1,3 @@
-import { auth } from "@/auth"
 import { NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { query } from "@/app/lib/db"
@@ -9,8 +8,16 @@ function getTodayString() {
   return new Date().toISOString().split("T")[0]
 }
 
+function getClientIp(request: NextRequest): string {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
+    request.headers.get("x-real-ip") ??
+    "internal"
+  )
+}
+
 // Returns the new count after incrementing (atomic upsert).
-async function incrementRateLimit(userId: string): Promise<number> {
+async function incrementRateLimit(ip: string): Promise<number> {
   const today = getTodayString()
   const rows = await query<{ count: number }>(
     `INSERT INTO rate_limits (user_id, date, count)
@@ -18,33 +25,32 @@ async function incrementRateLimit(userId: string): Promise<number> {
      ON CONFLICT (user_id, date)
      DO UPDATE SET count = rate_limits.count + 1
      RETURNING count`,
-    [userId, today]
+    [ip, today]
   )
   return rows[0].count
 }
 
-async function decrementRateLimit(userId: string): Promise<void> {
+async function decrementRateLimit(ip: string): Promise<void> {
   const today = getTodayString()
   await query(
     `UPDATE rate_limits
      SET count = GREATEST(0, count - 1)
      WHERE user_id = $1 AND date = $2`,
-    [userId, today]
+    [ip, today]
   )
 }
 
-async function getCurrentCount(userId: string): Promise<number> {
+async function getCurrentCount(ip: string): Promise<number> {
   const today = getTodayString()
   const rows = await query<{ count: number }>(
     `SELECT count FROM rate_limits WHERE user_id = $1 AND date = $2`,
-    [userId, today]
+    [ip, today]
   )
   return rows[0]?.count ?? 0
 }
 
 async function insertAuditLog(
-  userId: string,
-  email: string,
+  ip: string,
   question: string,
   model: string,
   queryNumber: number
@@ -53,7 +59,7 @@ async function insertAuditLog(
     `INSERT INTO audit_log (user_id, email, question, model, query_number)
      VALUES ($1, $2, $3, $4, $5)
      RETURNING id`,
-    [userId, email, question, model, queryNumber]
+    [ip, ip, question, model, queryNumber]
   )
   return rows[0].id
 }
@@ -88,18 +94,9 @@ interface ChatMessage {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth()
+    const ip = getClientIp(request)
 
-    if (!session?.user?.email || !session.user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    const userId = session.user.id
-    const email = session.user.email
-
-    // Check current count before incrementing to avoid burning a query slot on
-    // a user who is already at the limit
-    const currentCount = await getCurrentCount(userId)
+    const currentCount = await getCurrentCount(ip)
     if (currentCount >= DAILY_LIMIT) {
       return NextResponse.json(
         {
@@ -120,14 +117,12 @@ export async function POST(request: NextRequest) {
 
     const latestQuestion = messages[messages.length - 1].content.trim()
 
-    // Atomically increment — get back the new count
-    const newCount = await incrementRateLimit(userId)
+    const newCount = await incrementRateLimit(ip)
     const remaining = DAILY_LIMIT - newCount
     const model = detailed ? "claude-sonnet-4-6" : "claude-haiku-4-5-20251001"
 
-    // Write audit log and capture the row id for rollback on error
-    const auditId = await insertAuditLog(userId, email, latestQuestion, model, newCount)
-    console.log(`[AUDIT] ${email} — query ${newCount}/${DAILY_LIMIT}: "${latestQuestion.slice(0, 80)}"`)
+    const auditId = await insertAuditLog(ip, latestQuestion, model, newCount)
+    console.log(`[AUDIT] ${ip} — query ${newCount}/${DAILY_LIMIT}: "${latestQuestion.slice(0, 80)}"`)
 
     const client = new Anthropic()
 
@@ -150,13 +145,11 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          // Send rate-limit metadata as a trailing marker the client reads
           const meta = JSON.stringify({ remaining, limit: DAILY_LIMIT, model })
           controller.enqueue(new TextEncoder().encode(`\n\n__META__${meta}`))
         } catch (err) {
-          // Roll back — undo the increment and remove the audit entry
           await Promise.allSettled([
-            decrementRateLimit(userId),
+            decrementRateLimit(ip),
             deleteAuditLogEntry(auditId),
           ])
           console.error("Anthropic stream error:", err)
@@ -186,26 +179,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const session = await auth()
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
-  // Admin-only: return audit log from DB
-  const url = new URL(request.url)
-  if (url.searchParams.get("audit") === "1") {
-    const isAdmin = (session.user as any)?.isAdmin
-    if (!isAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-    const entries = await query(
-      `SELECT id, created_at, user_id, email, question, model, query_number
-       FROM audit_log
-       ORDER BY created_at DESC
-       LIMIT 500`
-    )
-    return NextResponse.json({ entries, total: entries.length })
-  }
-
-  const count = await getCurrentCount(session.user.id)
+  const ip = getClientIp(request)
+  const count = await getCurrentCount(ip)
   return NextResponse.json({
     remaining: DAILY_LIMIT - count,
     used: count,

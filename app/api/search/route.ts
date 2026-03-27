@@ -1,4 +1,3 @@
-import { auth } from "@/auth"
 import { NextRequest, NextResponse } from "next/server"
 import { query } from "@/app/lib/db"
 import OpenAI from "openai"
@@ -18,11 +17,6 @@ export interface FileResult {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth()
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
     const sp = request.nextUrl.searchParams
     const q = sp.get("q")?.trim() ?? ""
     const fileType = sp.get("type") ?? ""

@@ -60,13 +60,7 @@ function similarityColor(sim: number | null): string {
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-export default function SearchClient({
-  session,
-  onSignOut,
-}: {
-  session: any
-  onSignOut: () => Promise<void>
-}) {
+export default function SearchClient() {
   const [entries, setEntries] = useState<FileResult[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [activeType, setActiveType] = useState("all")
@@ -158,20 +152,9 @@ export default function SearchClient({
       <div className="border-b border-slate-700/50 bg-slate-900/60 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4">
 
-          {/* Top row: logo + user + sign out */}
-          <div className="flex items-center justify-between py-3 border-b border-slate-800/60">
-            <div>
-              <span className="text-lg font-bold text-slate-100">RHW Portal</span>
-              <span className="ml-3 text-xs text-slate-500">{session?.user?.email}</span>
-            </div>
-            <form action={onSignOut}>
-              <button
-                type="submit"
-                className="px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors"
-              >
-                Sign Out
-              </button>
-            </form>
+          {/* Top row: logo */}
+          <div className="flex items-center py-3 border-b border-slate-800/60">
+            <span className="text-lg font-bold text-slate-100">RHW Portal</span>
           </div>
 
           {/* Three-pillar navigation tabs */}

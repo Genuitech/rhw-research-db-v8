@@ -1,4 +1,3 @@
-import { auth } from "@/auth"
 import { NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { query } from "@/app/lib/db"
@@ -13,11 +12,6 @@ interface FileRow {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth()
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
     const { ids, question } = (await request.json()) as {
       ids: number[]
       question?: string
